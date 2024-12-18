@@ -13,7 +13,7 @@
     "tailwindcss": "npm:tailwindcss@^3.4.9"
   },
   "tasks": {
-    "serve": "deno run -A lume.ts -s",
+    "serve": "LUME_LOGS=WARN SKIP_CHECK_URLS=true deno run -A lume.ts -s",
     "start": "deno task serve",
     "dev": "deno task serve",
     "build": "deno run -A lume.ts",
