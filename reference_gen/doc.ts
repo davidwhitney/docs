@@ -3,8 +3,6 @@ import { encodeHex } from "jsr:@std/encoding/hex";
 import registrations from "./registrations.ts";
 import { fileExists, writeFiles } from "./common.ts";
 
-type FileMetadata = { fileIdentifier: string; filePath: string; hashPath: string; objectHash: string };
-
 console.time("doc");
 console.timeLog("doc", "Generating doc nodes...");
 
@@ -26,10 +24,8 @@ for (const { sources, generateOptions } of registrations) {
   }
 
   const files = await generateFiles(docs, generateOptions);
-
   await writeFiles("gen/" + metadata.fileIdentifier, files);
   await Deno.writeTextFile(metadata.hashPath, metadata.objectHash);
-  //await saveResults(files, metadata);
 }
 
 console.timeEnd("doc");
@@ -70,16 +66,6 @@ async function generateFiles(nodes: Record<string, DocNode[]>, generateOptions: 
 
   const allGeneratedFiles = await Promise.all(fileGenerationPromises);
   return allGeneratedFiles.reduce((acc, val) => ({ ...acc, ...val }), {});
-}
-
-async function saveResults(files: Record<string, string>, metadata: FileMetadata) {
-  console.timeLog("doc", "Writing files...");
-  const asString = JSON.stringify(files, null, 2);
-
-  await Deno.writeTextFile(metadata.filePath, asString);
-  await Deno.writeTextFile(metadata.hashPath, metadata.objectHash);
-
-  console.timeLog("doc", `Wrote ${metadata.fileIdentifier}.`);
 }
 
 // deno-lint-ignore no-explicit-any
