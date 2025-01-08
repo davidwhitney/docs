@@ -7,7 +7,7 @@ import {
   MightHaveNamespace,
   ReferenceContext,
 } from "../types.ts";
-import { insertLinkCodes, LinkCode } from "./primatives/LinkCode.tsx";
+import { insertLinkCodes } from "./primatives/LinkCode.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 import { CodeIcon } from "./primatives/CodeIcon.tsx";
 
@@ -39,25 +39,33 @@ export default function* getPages(
 
 export function CategoryHomePage({ data, context }: Props) {
   const categoryListItems = Object.entries(data).map(([key, value]) => {
-    const categoryLinkUrl =
-      `${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`;
-
     return (
-      <li>
-        <a href={categoryLinkUrl}>{key}</a>
-        <p>{value}</p>
-      </li>
+      <CategoryListSection
+        title={key}
+        href={`${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`}
+        summary={value || ""}
+      />
     );
   });
 
   return (
-    <ReferencePage context={context}>
-      <div>
-        <h1>I am a category: {data.name}</h1>
-        <ul>
+    <ReferencePage
+      context={context}
+      navigation={{
+        category: context.packageName,
+        currentItemName: "",
+      }}
+    >
+      <main>
+        <section>
+          <div class="space-y-2 flex-1 ">
+            <div class="space-y-7" id="module_doc"></div>
+          </div>
+        </section>
+        <div className={"space-y-7"}>
           {categoryListItems}
-        </ul>
-      </div>
+        </div>
+      </main>
     </ReferencePage>
   );
 }
@@ -112,13 +120,48 @@ export function SingleCategoryView({ categoryName, context }: ListingProps) {
   );
 }
 
+function CategoryListSection(
+  { title, href, summary }: { title: string; href: string; summary: string },
+) {
+  const anchorId = title.replace(" ", "-").toLocaleLowerCase();
+
+  const parts = summary.split("\n\n");
+  const examplePart = parts[parts.length - 1];
+  const partsExceptLast = parts.slice(0, parts.length - 1);
+  const summaryBody = partsExceptLast.join("\n\n");
+
+  const exampleBody = insertLinkCodes(examplePart);
+  const summaryBodyParas = summaryBody.split("\n\n").map((paragraph) => (
+    <p>{paragraph}</p>
+  ));
+
+  return (
+    <section id={anchorId} className={"section"}>
+      <AnchorableHeading anchor={anchorId}>
+        <a href={href}>{title}</a>
+      </AnchorableHeading>
+      <div
+        data-color-mode="auto"
+        data-light-theme="light"
+        data-dark-theme="dark"
+        class="markdown-body"
+      >
+        {summaryBodyParas}
+        <p>
+          {exampleBody}
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function CategoryPageSection(
   { title, items }: { title: string; items: DocNodeBase[] },
 ) {
   const anchorId = title.replace(" ", "-").toLocaleLowerCase();
   return (
     <section id={anchorId} className={"section"}>
-      <AnchorableHeading text={title} anchor={anchorId} />
+      <AnchorableHeading anchor={anchorId}>{title}</AnchorableHeading>
       <div className={"namespaceSection"}>
         {items.map((item) => <CategoryPageItem item={item} />)}
       </div>

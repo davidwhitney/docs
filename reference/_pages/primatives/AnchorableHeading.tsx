@@ -1,15 +1,11 @@
-export function AnchorableHeading(
-  { text, anchor }: { text: string; anchor?: string },
-) {
-  let generateAnchor = false;
-  if (!anchor) {
-    anchor = text.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
-    generateAnchor = true;
-  }
+import React from "npm:@preact/compat";
 
+export function AnchorableHeading(
+  { children, anchor }: { children: React.ReactNode; anchor?: string },
+) {
   const anchorValue = `#${anchor}`;
   const clipPath = `url(${anchorValue})`;
-  const headerId = generateAnchor ? anchorValue : undefined;
+  const headerId = anchorValue;
 
   return (
     <div>
@@ -38,7 +34,7 @@ export function AnchorableHeading(
             </defs>
           </svg>
         </a>
-        {text}
+        {children}
       </h2>
     </div>
   );
