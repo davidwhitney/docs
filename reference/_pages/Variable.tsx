@@ -19,7 +19,10 @@ export default function* getPages(
 
 export function Variable({ data, context }: Props) {
   return (
-    <ReferencePage context={context}>
+    <ReferencePage
+      context={context}
+      navigation={{ category: context.section, currentItemName: data.name }}
+    >
       I am a variable, my name is {data.name}
 
       {data.jsDoc?.doc && <p>{data.jsDoc?.doc}</p>}

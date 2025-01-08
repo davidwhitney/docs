@@ -2,7 +2,7 @@ import { DocNodeFunction, DocNodeImport } from "@deno/doc/types";
 import { LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 
-type Props = { data: DocNodeFunction, context: ReferenceContext };
+type Props = { data: DocNodeFunction; context: ReferenceContext };
 
 export default function* getPages(
   item: DocNodeFunction,
@@ -20,7 +20,10 @@ export default function* getPages(
 
 export function Function({ data, context }: Props) {
   return (
-    <ReferencePage context={context}>
+    <ReferencePage
+      context={context}
+      navigation={{ category: context.section, currentItemName: data.name }}
+    >
       I am a function, my name is {data.name}
 
       {data.jsDoc?.doc && <p>{data.jsDoc?.doc}</p>}

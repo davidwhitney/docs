@@ -1,6 +1,5 @@
 import { DocNodeClass } from "@deno/doc/types";
 import { LumeDocument, ReferenceContext } from "../types.ts";
-import factoryFor from "../pageFactory.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 
 type Props = { data: DocNodeClass; context: ReferenceContext };
@@ -13,7 +12,8 @@ export default function* getPages(
 
   yield {
     title: item.name,
-    url: `${context.root}/${context.section.toLocaleLowerCase()}/~/${prefix}${item.name}`,
+    url:
+      `${context.root}/${context.section.toLocaleLowerCase()}/~/${prefix}${item.name}`,
     content: <Class data={item} context={context} />,
   };
 }
@@ -50,8 +50,11 @@ export function Class({ data, context }: Props) {
     );
   });
 
-  return (    
-    <ReferencePage context={context}>
+  return (
+    <ReferencePage
+      context={context}
+      navigation={{ category: context.section, currentItemName: fullName }}
+    >
       <h1>Class: {fullName}</h1>
       {isUnstable && <p>UNSTABLE</p>}
       {jsDocParagraphs && jsDocParagraphs}

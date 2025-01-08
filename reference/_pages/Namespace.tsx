@@ -37,7 +37,10 @@ export function Namespace({ data, context }: Props) {
   );
 
   return (
-    <ReferencePage context={context}>
+    <ReferencePage
+      context={context}
+      navigation={{ category: context.section, currentItemName: data.name }}
+    >
       <h1>Namespace: {context.section} - {data.name}</h1>
 
       <h2>Classes</h2>

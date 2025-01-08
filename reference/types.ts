@@ -26,6 +26,11 @@ export type ReferenceDocContext = {
     categories: ReferenceDocCategory[];
 }
 
+export type Navigation = {
+    category: string;
+    currentItemName: string;
+}
+
 export type ReferenceContext = {
     root: string;
     section: string;

@@ -90,19 +90,23 @@ export function SingleCategoryView({ categoryName, context }: ListingProps) {
   ).sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <ReferencePage context={context}>
-      <h1>I am a category listing page {categoryName}</h1>
-
-      <h2 className={"anchorable mb-1"}>Classes</h2>
-      <div className={"namespaceSection"}>
-        <CategoryPageList items={classes} />
-      </div>
-      <CategoryPageSection title={"Functions"} items={functions} />
-      <CategoryPageSection title={"Interfaces"} items={interfaces} />
-      <CategoryPageSection title={"Type Aliases"} items={typeAliases} />
-      <pre>
-        {JSON.stringify(itemsInThisCategory, null, 2)}
-      </pre>
+    <ReferencePage
+      context={context}
+      navigation={{ category: context.section, currentItemName: categoryName }}
+    >
+      <main>
+        <div className={"space-y-7"}>
+          <section id={"Classes"} className={"section"}>
+            <h2 className={"anchorable mb-1"}>Classes</h2>
+          </section>
+          <div className={"namespaceSection"}>
+            <CategoryPageList items={classes} />
+          </div>
+          <CategoryPageSection title={"Functions"} items={functions} />
+          <CategoryPageSection title={"Interfaces"} items={interfaces} />
+          <CategoryPageSection title={"Type Aliases"} items={typeAliases} />
+        </div>
+      </main>
     </ReferencePage>
   );
 }

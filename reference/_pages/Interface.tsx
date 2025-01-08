@@ -12,7 +12,8 @@ export default function* getPages(
 
   yield {
     title: item.name,
-    url: `${context.root}/${context.section.toLocaleLowerCase()}/~/${prefix}${item.name}`,
+    url:
+      `${context.root}/${context.section.toLocaleLowerCase()}/~/${prefix}${item.name}`,
     content: <Interface data={item} context={context} />,
   };
 }
@@ -31,7 +32,10 @@ export function Interface({ data, context }: Props) {
   ));
 
   return (
-    <ReferencePage context={context}>
+    <ReferencePage
+      context={context}
+      navigation={{ category: context.section, currentItemName: fullName }}
+    >
       <h1>Interface: {fullName}</h1>
       {isUnstable && <p>UNSTABLE</p>}
       {jsDocParagraphs && jsDocParagraphs}
