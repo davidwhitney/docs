@@ -1,6 +1,12 @@
+import { DocNodeBase } from "@deno/doc/types";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { flattenItems } from "../_util/common.ts";
-import { LumeDocument, ReferenceContext } from "../types.ts";
+import {
+  HasNamespace,
+  LumeDocument,
+  MightHaveNamespace,
+  ReferenceContext,
+} from "../types.ts";
 
 type Props = {
   data: Record<string, string | undefined>;
@@ -82,64 +88,56 @@ export function SingleCategoryView({ categoryName, context }: ListingProps) {
     item.kind === "typeAlias"
   ).sort((a, b) => a.name.localeCompare(b.name));
 
-  const itemElements = itemsInThisCategory.map((item) => {
-    return (
-      <li>
-        <a href={`~/${item.fullName || item.name}`}>
-          {item.fullName || item.name}
-        </a>
-      </li>
-    );
-  });
-
   return (
     <ReferencePage>
       <h1>I am a category listing page {categoryName}</h1>
+
       <h2 className={"anchorable mb-1"}>Classes</h2>
       <div className={"namespaceSection"}>
-        <ul>
-          {classes.map((item) => (
-            <li>
-              <a href={`~/${item.fullName || item.name}`}>
-                {item.fullName || item.name}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <CategoryPageList items={classes} />
       </div>
-
-      <h2 className={"anchorable mb-1"}>Functions</h2>
-      <ul>
-        {functions.map((item) => (
-          <li>
-            <a href={`~/${item.fullName || item.name}`}>
-              {item.fullName || item.name}
-            </a>
-          </li>
-        ))}
-      </ul>
-
-      <h2 className={"anchorable mb-1"}>Interfaces</h2>
-      <ul>
-        {interfaces.map((item) => (
-          <li>
-            <a href={`~/${item.fullName || item.name}`}>
-              {item.fullName || item.name}
-            </a>
-          </li>
-        ))}
-      </ul>
-
-      <h2 className={"anchorable mb-1"}>Type Aliases</h2>
-      <ul>
-        {typeAliases.map((item) => (
-          <li>
-            <a href={`~/${item.fullName || item.name}`}>
-              {item.fullName || item.name}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <CategoryPageSection title={"Functions"} items={functions} />
+      <CategoryPageSection title={"Interfaces"} items={interfaces} />
+      <CategoryPageSection title={"Type Aliases"} items={typeAliases} />
     </ReferencePage>
   );
+}
+
+function CategoryPageSection(
+  { title, items }: { title: string; items: DocNodeBase[] },
+) {
+  return (
+    <section>
+      <h2>{title}</h2>
+      <CategoryPageList items={items} />
+    </section>
+  );
+}
+
+function CategoryPageList({ items }: { items: DocNodeBase[] }) {
+  return (
+    <ul className={"anchorable mb-1"}>
+      {items.map((item) => (
+        <li>
+          <CategoryPageListItem item={item} />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function CategoryPageListItem(
+  { item }: { item: DocNodeBase & MightHaveNamespace },
+) {
+  return (
+    <li>
+      <a href={`~/${item.fullName || item.name}`}>
+        <ItemName item={item} />
+      </a>
+    </li>
+  );
+}
+
+function ItemName({ item }: { item: DocNodeBase & MightHaveNamespace }) {
+  return <>{item.fullName || item.name}</>;
 }
