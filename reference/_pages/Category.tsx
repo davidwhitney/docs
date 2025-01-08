@@ -7,7 +7,6 @@ import {
   MightHaveNamespace,
   ReferenceContext,
 } from "../types.ts";
-import { CHAR_NO_BREAK_SPACE } from "https://deno.land/std@0.170.0/path/_constants.ts";
 
 type Props = {
   data: Record<string, string | undefined>;
@@ -15,16 +14,17 @@ type Props = {
 };
 
 export default function* getPages(
-  item: Record<string, string | undefined>,
   context: ReferenceContext,
 ): IterableIterator<LumeDocument> {
   yield {
     title: context.section,
     url: `${context.root}/${context.section.toLocaleLowerCase()}/`,
-    content: <CategoryHomePage data={item} context={context} />,
+    content: (
+      <CategoryHomePage data={context.currentCategoryList} context={context} />
+    ),
   };
 
-  for (const [key] of Object.entries(item)) {
+  for (const [key] of Object.entries(context.currentCategoryList)) {
     yield {
       title: key,
       url:
@@ -48,7 +48,7 @@ export function CategoryHomePage({ data, context }: Props) {
   });
 
   return (
-    <ReferencePage>
+    <ReferencePage context={context}>
       <div>
         <h1>I am a category: {data.name}</h1>
         <ul>
@@ -90,7 +90,7 @@ export function SingleCategoryView({ categoryName, context }: ListingProps) {
   ).sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <ReferencePage>
+    <ReferencePage context={context}>
       <h1>I am a category listing page {categoryName}</h1>
 
       <h2 className={"anchorable mb-1"}>Classes</h2>

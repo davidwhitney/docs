@@ -51,7 +51,7 @@ export function Class({ data, context }: Props) {
   });
 
   return (    
-    <ReferencePage>
+    <ReferencePage context={context}>
       <h1>Class: {fullName}</h1>
       {isUnstable && <p>UNSTABLE</p>}
       {jsDocParagraphs && jsDocParagraphs}

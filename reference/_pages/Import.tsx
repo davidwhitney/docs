@@ -2,7 +2,7 @@ import { DocNode, DocNodeImport } from "@deno/doc/types";
 import { LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 
-type Props = { data: DocNode };
+type Props = { data: DocNode, context: ReferenceContext };
 
 export default function* getPages(
   item: DocNodeImport,
@@ -12,13 +12,13 @@ export default function* getPages(
     title: item.name,
     url:
       `${context.root}/${context.section.toLocaleLowerCase()}/${item.name.toLocaleLowerCase()}.import`,
-    content: <Import data={item} />,
+    content: <Import data={item} context={context} />,
   };
 }
 
-export function Import({ data }: Props) {
+export function Import({ data, context }: Props) {
   return (
-    <ReferencePage>
+    <ReferencePage context={context}>
       I am a Import, my name is {data.name}
 
       <pre>

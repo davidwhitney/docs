@@ -2,7 +2,7 @@ import { DocNode, DocNodeBase } from "@deno/doc/types";
 import { LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 
-type Props = { data: DocNode };
+type Props = { data: DocNode, context: ReferenceContext };
 
 export default function* getPages(
   item: DocNodeBase,
@@ -24,9 +24,9 @@ export default function* getPages(
   // };
 }
 
-export function NotImplemented({ data }: Props) {
+export function NotImplemented({ data, context }: Props) {
   return (
-    <ReferencePage>
+    <ReferencePage context={context}>
       I am not yet implemented, but I am supposed to represent:{" "}
       {JSON.stringify(data)}
     </ReferencePage>

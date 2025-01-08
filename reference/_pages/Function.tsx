@@ -2,7 +2,7 @@ import { DocNodeFunction, DocNodeImport } from "@deno/doc/types";
 import { LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 
-type Props = { data: DocNodeFunction };
+type Props = { data: DocNodeFunction, context: ReferenceContext };
 
 export default function* getPages(
   item: DocNodeFunction,
@@ -14,13 +14,13 @@ export default function* getPages(
     title: item.name,
     url:
       `${context.root}/${context.section.toLocaleLowerCase()}/~/${prefix}${item.name}`,
-    content: <Function data={item} />,
+    content: <Function data={item} context={context} />,
   };
 }
 
-export function Function({ data }: Props) {
+export function Function({ data, context }: Props) {
   return (
-    <ReferencePage>
+    <ReferencePage context={context}>
       I am a function, my name is {data.name}
 
       {data.jsDoc?.doc && <p>{data.jsDoc?.doc}</p>}

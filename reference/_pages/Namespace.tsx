@@ -37,7 +37,7 @@ export function Namespace({ data, context }: Props) {
   );
 
   return (
-    <ReferencePage>
+    <ReferencePage context={context}>
       <h1>Namespace: {context.section} - {data.name}</h1>
 
       <h2>Classes</h2>

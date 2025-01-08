@@ -2,7 +2,7 @@ import { DocNodeVariable } from "@deno/doc/types";
 import { LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 
-type Props = { data: DocNodeVariable };
+type Props = { data: DocNodeVariable; context: ReferenceContext };
 
 export default function* getPages(
   item: DocNodeVariable,
@@ -13,13 +13,13 @@ export default function* getPages(
     title: item.name,
     url:
       `${context.root}/${context.section.toLocaleLowerCase()}/~/${prefix}${item.name}`,
-    content: <Variable data={item} />,
+    content: <Variable data={item} context={context} />,
   };
 }
 
-export function Variable({ data }: Props) {
+export function Variable({ data, context }: Props) {
   return (
-    <ReferencePage>
+    <ReferencePage context={context}>
       I am a variable, my name is {data.name}
 
       {data.jsDoc?.doc && <p>{data.jsDoc?.doc}</p>}

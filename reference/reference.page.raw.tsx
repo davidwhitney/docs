@@ -2,10 +2,10 @@ import { doc } from "@deno/doc";
 import registrations from "../reference_gen/registrations.ts";
 import factoryFor from "./pageFactory.ts";
 import getCategoryPages from "./_pages/Category.tsx";
-import { flattenItems, populateItemNamespaces } from "./_util/common.ts";
+import { populateItemNamespaces } from "./_util/common.ts";
 
 export const layout = "raw.tsx";
-const root = "/new_api";
+const root = "/api";
 
 export const sidebar = [
   {
@@ -43,13 +43,11 @@ export default async function* () {
         definitionFile,
         parentName: "",
         referenceDocContext,
+        currentCategoryList: generateOptions.categoryDocs!,
       };
 
       for (
-        const catPage of getCategoryPages(
-          generateOptions.categoryDocs!,
-          context,
-        )
+        const catPage of getCategoryPages(context)
       ) {
         yield catPage;
         generated.push(catPage.url);

@@ -31,7 +31,7 @@ export function Interface({ data, context }: Props) {
   ));
 
   return (
-    <ReferencePage>
+    <ReferencePage context={context}>
       <h1>Interface: {fullName}</h1>
       {isUnstable && <p>UNSTABLE</p>}
       {jsDocParagraphs && jsDocParagraphs}
