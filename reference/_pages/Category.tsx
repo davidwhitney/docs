@@ -9,6 +9,7 @@ import {
 } from "../types.ts";
 import { insertLinkCodes, LinkCode } from "./primatives/LinkCode.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
+import { CodeIcon } from "./primatives/CodeIcon.tsx";
 
 type Props = {
   data: Record<string, string | undefined>;
@@ -101,14 +102,7 @@ export function SingleCategoryView({ categoryName, context }: ListingProps) {
     >
       <main>
         <div className={"space-y-7"}>
-          <section id={"Classes"} className={"section"}>
-            <div>
-              <AnchorableHeading text="Classes" anchor="Classes" />
-            </div>
-          </section>
-          <div className={"namespaceSection"}>
-            <CategoryPageList items={classes} />
-          </div>
+          <CategoryPageSection title={"Classes"} items={classes} />
           <CategoryPageSection title={"Functions"} items={functions} />
           <CategoryPageSection title={"Interfaces"} items={interfaces} />
           <CategoryPageSection title={"Type Aliases"} items={typeAliases} />
@@ -121,37 +115,37 @@ export function SingleCategoryView({ categoryName, context }: ListingProps) {
 function CategoryPageSection(
   { title, items }: { title: string; items: DocNodeBase[] },
 ) {
+  const anchorId = title.replace(" ", "-").toLocaleLowerCase();
   return (
-    <section>
-      <h2>{title}</h2>
-      <CategoryPageList items={items} />
+    <section id={anchorId} className={"section"}>
+      <AnchorableHeading text={title} anchor={anchorId} />
+      <div className={"namespaceSection"}>
+        {items.map((item) => <CategoryPageItem item={item} />)}
+      </div>
     </section>
   );
 }
 
-function CategoryPageList(
-  { items }: { items: (DocNodeBase & MightHaveNamespace)[] },
+function CategoryPageItem(
+  { item }: { item: DocNodeBase & MightHaveNamespace },
 ) {
-  return (
-    <ul className={"anchorable mb-1"}>
-      {items.map((item) => {
-        const displayName = item.fullName || item.name;
-        const firstLineOfJsDoc = item.jsDoc?.doc?.split("\n")[0] || "";
-        const descriptionWithLinkCode = insertLinkCodes(firstLineOfJsDoc);
+  const displayName = item.fullName || item.name;
+  const firstLineOfJsDoc = item.jsDoc?.doc?.split("\n")[0] || "";
+  const descriptionWithLinkCode = insertLinkCodes(firstLineOfJsDoc);
 
-        return (
-          <li>
-            <a href={`~/${displayName}`}>
-              {displayName}
-            </a>
-            <p>
-              {descriptionWithLinkCode}
-            </p>
-            <MethodLinks item={item} />
-          </li>
-        );
-      })}
-    </ul>
+  return (
+    <div className={"namespaceItem"}>
+      <CodeIcon glyph={item.kind} />
+      <div className={"namespaceItemContent"}>
+        <a href={`~/${displayName}`}>
+          {displayName}
+        </a>
+        <p>
+          {descriptionWithLinkCode}
+        </p>
+        <MethodLinks item={item} />
+      </div>
+    </div>
   );
 }
 
