@@ -122,41 +122,28 @@ function CategoryPageSection(
   );
 }
 
-function CategoryPageList({ items }: { items: DocNodeBase[] }) {
-  return (
-    <ul className={"anchorable mb-1"}>
-      {items.map((item) => (
-        <li>
-          <CategoryPageListItem item={item} />
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function CategoryPageListItem(
-  { item }: { item: DocNodeBase & MightHaveNamespace },
+function CategoryPageList(
+  { items }: { items: (DocNodeBase & MightHaveNamespace)[] },
 ) {
   return (
-    <li>
-      <a href={`~/${item.fullName || item.name}`}>
-        <ItemName item={item} />
-      </a>
-      <p>
-        {item.jsDoc?.doc || ""}
-      </p>
-      <p>
-        <pre>
-          {JSON.stringify(item, null, 2)}
-        </pre>
-      </p>
-      <MethodLinks item={item} />
-    </li>
-  );
-}
+    <ul className={"anchorable mb-1"}>
+      {items.map((item) => {
+        const displayName = item.fullName || item.name;
 
-function ItemName({ item }: { item: DocNodeBase & MightHaveNamespace }) {
-  return <>{item.fullName || item.name}</>;
+        return (
+          <li>
+            <a href={`~/${displayName}`}>
+              {displayName}
+            </a>
+            <p>
+              {item.jsDoc?.doc || ""}
+            </p>
+            <MethodLinks item={item} />
+          </li>
+        );
+      })}
+    </ul>
+  );
 }
 
 function MethodLinks({ item }: { item: DocNodeBase }) {
