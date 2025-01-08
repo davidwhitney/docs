@@ -1,6 +1,7 @@
 import { doc } from "@deno/doc";
 import registrations from "../reference_gen/registrations.ts";
 import factoryFor from "./pageFactory.ts";
+import getCategoryPages from "./_pages/Category.tsx";
 
 export const layout = "raw.tsx";
 const root = "/new_api";
@@ -24,32 +25,48 @@ export default async function* () {
     }
 
     for await (
-      const { section, item, siblingItems, definitionFile } of referenceItems()
+      const { key, dataCollection, generateOptions } of referenceItems()
     ) {
-      const factory = factoryFor(item);
+      const section = generateOptions.packageName || "unknown";
+      const definitionFile = key;
 
-      const pages = factory(item, {
+      const context = {
         root,
         section,
-        siblingItems,
+        dataCollection,
         definitionFile,
         parentName: "",
-      });
+      };
 
-      if (!pages) {
-        continue;
+      for (
+        const catPage of getCategoryPages(
+          generateOptions.categoryDocs!,
+          context,
+        )
+      ) {
+        yield catPage;
+        generated.push(catPage.url);
       }
 
-      for await (const page of pages) {
-        if (generated.includes(page.url)) {
-          console.warn(
-            `⚠️ Skipping duplicate page: ${page.url} - NEED TO MERGE THESE DOCS`,
-          );
+      for (const item of dataCollection) {
+        const factory = factoryFor(item);
+        const pages = factory(item, context);
+
+        if (!pages) {
           continue;
         }
 
-        yield page;
-        generated.push(page.url);
+        for await (const page of pages) {
+          if (generated.includes(page.url)) {
+            console.warn(
+              `⚠️ Skipping duplicate page: ${page.url} - NEED TO MERGE THESE DOCS`,
+            );
+            continue;
+          }
+
+          yield page;
+          generated.push(page.url);
+        }
       }
     }
   } catch (ex) {
@@ -73,17 +90,8 @@ async function* referenceItems() {
     const docs = await loadDocumentation(paths);
 
     for (const key of Object.keys(docs)) {
-      const data = docs[key];
-
-      for (const item of data) {
-        yield {
-          section: generateOptions.packageName ||
-            "unknown",
-          item,
-          siblingItems: data,
-          definitionFile: key,
-        };
-      }
+      const dataCollection = docs[key];
+      yield { key, dataCollection, generateOptions };
     }
   }
 }

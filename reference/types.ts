@@ -10,7 +10,7 @@ export type LumeDocument = {
 export type ReferenceContext = {
     root: string;
     section: string;
-    siblingItems: DocNode[];
+    dataCollection: DocNode[];
     definitionFile: string;
     parentName: string;
 }

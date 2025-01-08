@@ -10,7 +10,8 @@ export default function* getPages(
 ): IterableIterator<LumeDocument> {
   yield {
     title: item.name,
-    url: `${context.root}/${context.section.toLocaleLowerCase()}/${item.name.toLocaleLowerCase()}`,
+    url:
+      `${context.root}/${context.section.toLocaleLowerCase()}/${item.name.toLocaleLowerCase()}`,
     content: <Namespace data={item} context={context} />,
   };
 
@@ -19,7 +20,7 @@ export default function* getPages(
 
     yield* factory(element, {
       ...context,
-      siblingItems: item.namespaceDef.elements,
+      dataCollection: item.namespaceDef.elements,
       parentName: item.name,
     });
   }
