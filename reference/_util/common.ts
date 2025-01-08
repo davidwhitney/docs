@@ -1,4 +1,4 @@
-import { DocNode, DocNodeBase, DocNodeInterface, DocNodeNamespace } from "@deno/doc/types";
+import { DocNode, DocNodeBase } from "@deno/doc/types";
 import { HasFullName, HasNamespace, MightHaveNamespace } from "../types.ts";
 
 export function flattenItems(items: (DocNode & MightHaveNamespace)[]): (DocNodeBase & MightHaveNamespace)[] {
