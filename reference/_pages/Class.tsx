@@ -1,6 +1,8 @@
+import React from "npm:@preact/compat";
 import { DocNodeClass } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
+import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -27,12 +29,11 @@ export function Class({ data, context }: Props) {
 
   const constructors = data.classDef.constructors.map((constructor) => {
     return (
-      <div>
-        <h3>Constructor</h3>
+      <MemberSection title="Constructors">
         <pre>
           {JSON.stringify(constructor, null, 2)}
         </pre>
-      </div>
+      </MemberSection>
     );
   });
 
@@ -52,23 +53,64 @@ export function Class({ data, context }: Props) {
         currentItemName: data.fullName,
       }}
     >
-      <h1>Class: {data.fullName}</h1>
-      {isUnstable && <p>UNSTABLE</p>}
-      {jsDocParagraphs && jsDocParagraphs}
+      <div id={"content"}>
+        <main class={"symbolGroup"}>
+          <article>
+            <div>
+              <div>
+                <div className={"text-2xl leading-none break-all"}>
+                  <span class="text-Class">class</span>
+                  <span class="font-bold">
+                    &nbsp;
+                    {data.fullName}
+                  </span>
+                </div>
+                <div className={"symbolSubtitle"}>
+                  {isUnstable && <>UNSTABLE</>}
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className={"space-y-7"}>
+                <section id={"methods"} className={"section"}>
+                  <AnchorableHeading anchor="methods">
+                    Methods
+                  </AnchorableHeading>
+                </section>
+              </div>
+            </div>
+            {jsDocParagraphs && jsDocParagraphs}
+            {constructors && constructors}
 
-      <h2>Constructors</h2>
-      {constructors && constructors}
+            <h2>Properties</h2>
+            {properties && properties}
 
-      <h2>Properties</h2>
-      {properties && properties}
+            <h2>Methods</h2>
 
-      <h2>Methods</h2>
-
-      <h2>Static Methods</h2>
-
-      <pre>
-        {JSON.stringify(data, null, 2)}
-      </pre>
+            <h2>Static Methods</h2>
+          </article>
+        </main>
+      </div>
     </ReferencePage>
+  );
+}
+
+function MemberSection(
+  { title, children }: { title: string; children: React.ReactNode },
+) {
+  return (
+    <div>
+      <div className={"space-y-7"}>
+        <section id={title} className={"section"}>
+          <AnchorableHeading anchor={title}>
+            Methods
+          </AnchorableHeading>
+        </section>
+      </div>
+
+      <div className={"space-y-7"}>
+        {children}
+      </div>
+    </div>
   );
 }

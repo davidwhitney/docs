@@ -8,6 +8,7 @@ import webCategoryDocs from "./_categories/web-categories.json" with {
 import denoCategoryDocs from "./_categories/deno-categories.json" with {
   type: "json",
 };
+import { DocNode } from "@deno/doc/types";
 
 export const layout = "raw.tsx";
 
@@ -36,7 +37,7 @@ export default async function* () {
     }
 
     for await (const { packageName, symbols } of getSymbols()) {
-      populateItemNamespaces(symbols);
+      const cleanedSymbols = populateItemNamespaces(symbols) as DocNode[];
 
       const currentCategoryList = sections.filter((x) =>
         x.path === packageName.toLocaleLowerCase()
@@ -45,7 +46,7 @@ export default async function* () {
       const context = {
         root,
         packageName,
-        symbols,
+        symbols: cleanedSymbols,
         currentCategoryList: currentCategoryList,
       };
 
@@ -54,7 +55,7 @@ export default async function* () {
         generated.push(p.url);
       }
 
-      for (const item of symbols) {
+      for (const item of cleanedSymbols) {
         const pages = generatePageFor(item, context);
 
         for await (const page of pages) {

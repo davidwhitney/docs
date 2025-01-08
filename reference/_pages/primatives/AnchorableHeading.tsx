@@ -1,7 +1,7 @@
 import React from "npm:@preact/compat";
 
 export function AnchorableHeading(
-  { children, anchor }: { children: React.ReactNode; anchor?: string },
+  { children, anchor }: { children: React.ReactNode; anchor: string },
 ) {
   const anchorValue = `#${anchor}`;
   const clipPath = `url(${anchorValue})`;

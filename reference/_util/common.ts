@@ -1,8 +1,17 @@
 import { DocNode, DocNodeBase } from "@deno/doc/types";
 import { HasFullName, HasNamespace, MightHaveNamespace } from "../types.ts";
 
-export function flattenItems(items: (DocNode & MightHaveNamespace)[]): (DocNodeBase & MightHaveNamespace)[] {
-    return populateItemNamespaces(items, true);
+export function flattenItems(items: DocNode[]): (DocNodeBase & MightHaveNamespace)[] {
+    const flattened: (DocNodeBase)[] = [];
+    for (const item of items) {
+
+        if (item.kind === "namespace") {
+            flattened.push(...flattenItems(item.namespaceDef.elements));
+        } else {
+            flattened.push(item);
+        }
+    }
+    return flattened;
 }
 
 export function populateItemNamespaces(items: DocNode[], populateNamespace = true, ns = ""): (DocNodeBase & HasNamespace)[] {
