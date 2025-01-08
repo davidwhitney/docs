@@ -3,6 +3,10 @@ import { DocNodeClass } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
+import {
+  insertLinkCodes,
+  linkCodeAndParagraph,
+} from "./primatives/LinkCode.tsx";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -23,9 +27,7 @@ export function Class({ data, context }: Props) {
     tag.kind === "experimental" as string
   );
 
-  const jsDocParagraphs = data.jsDoc?.doc?.split("\n\n").map((paragraph) => (
-    <p>{paragraph}</p>
-  ));
+  const description = linkCodeAndParagraph(data.jsDoc?.doc || "");
 
   const constructors = data.classDef.constructors.map((constructor) => {
     return (
@@ -79,7 +81,18 @@ export function Class({ data, context }: Props) {
                 </section>
               </div>
             </div>
-            {jsDocParagraphs && jsDocParagraphs}
+
+            <div className={"space-y-7"}>
+              <div
+                data-color-mode="auto"
+                data-light-theme="light"
+                data-dark-theme="dark"
+                class="markdown-body"
+              >
+                {description && description}
+              </div>
+            </div>
+
             {constructors && constructors}
 
             <h2>Properties</h2>

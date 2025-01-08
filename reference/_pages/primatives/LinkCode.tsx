@@ -30,3 +30,32 @@ export function insertLinkCodes(text: string) {
 
   return merge;
 }
+
+export function linkCodeAndParagraph(text: string) {
+  // deno-lint-ignore no-explicit-any
+  const withLinks: any = insertLinkCodes(text);
+
+  for (const index in withLinks) {
+    const current = withLinks[index];
+
+    if (
+      typeof current === "string" && current.includes("\n\n")
+    ) {
+      const withBreaks = current.split("\n\n").map((line: string) => {
+        return (
+          <>
+            {line}
+            <br />
+            <br />
+          </>
+        );
+      });
+
+      withLinks.splice(index, 1, withBreaks);
+    }
+  }
+
+  console.log(withLinks);
+
+  return withLinks;
+}
