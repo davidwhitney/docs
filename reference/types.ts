@@ -35,9 +35,7 @@ export type ReferenceContext = {
     root: string;
     section: string;
     dataCollection: DocNode[];
-    definitionFile: string;
     parentName: string;
-    referenceDocContext: ReferenceDocContext;
     currentCategoryList: Record<string, string | undefined>;
 }
 

@@ -8,7 +8,28 @@ export default function Layout(
     children: React.ReactNode;
   },
 ) {
+  return (
+    <>
+      {/* sorry mum, put these somewhere good */}
+      <link rel="stylesheet" href="/reference-styles/styles.css" />
+      <link rel="stylesheet" href="/reference-styles/page.css" />
+
+      <div className={"ddoc"}>
+        <CategoryPanel context={context} />
+        <div>
+          {navigation && <TopNav {...navigation} />}
+          <div id={"content"}>
+            {children}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function CategoryPanel({ context }: { context: ReferenceContext }) {
   const categories = context.currentCategoryList;
+
   const categoryListItems = Object.entries(categories).map(([key, value]) => {
     const categoryLinkUrl =
       `${context.root}/${context.section.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`;
@@ -21,25 +42,11 @@ export default function Layout(
   });
 
   return (
-    <>
-      {/* sorry mum, put these somewhere good */}
-      <link rel="stylesheet" href="/reference-styles/styles.css" />
-      <link rel="stylesheet" href="/reference-styles/page.css" />
-
-      <div className={"ddoc"}>
-        <div id={"categoryPanel"}>
-          <ul>
-            {categoryListItems}
-          </ul>
-        </div>
-        <div>
-          {navigation && <TopNav {...navigation} />}
-          <div id={"content"}>
-            {children}
-          </div>
-        </div>
-      </div>
-    </>
+    <div id={"categoryPanel"}>
+      <ul>
+        {categoryListItems}
+      </ul>
+    </div>
   );
 }
 

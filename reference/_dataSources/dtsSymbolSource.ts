@@ -1,0 +1,52 @@
+import { expandGlob } from "@std/fs";
+import { doc, DocNode } from "@deno/doc";
+
+export type Package = {
+    name: string;
+    symbols: DocNode[];
+}
+
+const packages = [
+    { name: "Web", files: ["./types/web.d.ts"], },
+    { name: "Deno", files: ["./types/deno.d.ts"], },
+    { name: "Node", files: await getNodeTypeFiles() },
+];
+
+export async function* getSymbols() {
+
+
+    for (const { name, files } of packages) {
+        const paths = files.map((file) => {
+            if (!file.startsWith("./")) {
+                return `file://${file}`;
+            } else {
+                const newPath = file.replace("./", "../../reference_gen/");
+                return import.meta.resolve(newPath);
+            }
+        });
+
+        const docs = await loadDocumentation(paths);
+
+        for (const sourceFile of Object.keys(docs)) {
+            const symbols = docs[sourceFile];
+            yield { name, symbols };
+        }
+    }
+}
+
+async function loadDocumentation(paths: string[]) {
+    const docGenerationPromises = paths.map(async (path) => {
+        return await doc([path]);
+    });
+
+    const nodes = await Promise.all(docGenerationPromises);
+    return nodes.reduce((acc, val) => ({ ...acc, ...val }), {});
+}
+
+async function getNodeTypeFiles() {
+    const urls: string[] = [];
+    for await (const file of expandGlob("./types/node/[!_]*")) {
+        urls.push(file.path);
+    }
+    return urls;
+}

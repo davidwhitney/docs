@@ -1,6 +1,6 @@
 import { DocNodeNamespace } from "@deno/doc/types";
 import { LumeDocument, ReferenceContext } from "../types.ts";
-import factoryFor from "../pageFactory.ts";
+import generatePageFor from "../pageFactory.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 
 type Props = { data: DocNodeNamespace; context: ReferenceContext };
@@ -17,9 +17,7 @@ export default function* getPages(
   };
 
   for (const element of item.namespaceDef.elements) {
-    const factory = factoryFor(element);
-
-    yield* factory(element, {
+    yield* generatePageFor(element, {
       ...context,
       dataCollection: item.namespaceDef.elements,
       parentName: item.name,
