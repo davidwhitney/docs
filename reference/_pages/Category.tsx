@@ -1,3 +1,5 @@
+import ReferencePage from "../_layouts/ReferencePage.tsx";
+import { flattenItems } from "../_util/common.ts";
 import { LumeDocument, ReferenceContext } from "../types.ts";
 
 type Props = {
@@ -12,58 +14,75 @@ export default function* getPages(
   yield {
     title: context.section,
     url: `${context.root}/${context.section.toLocaleLowerCase()}/`,
-    content: <Category data={item} context={context} />,
+    content: <CategoryHomePage data={item} context={context} />,
   };
 
-  for (const [key, value] of Object.entries(item)) {
-    if (value) {
-      yield {
-        title: key,
-        url:
-          `${context.root}/${context.section.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`,
-        content: <CategoryListing data={item} context={context} />,
-      };
-    }
+  for (const [key] of Object.entries(item)) {
+    yield {
+      title: key,
+      url:
+        `${context.root}/${context.section.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`,
+      content: <SingleCategoryView categoryName={key} context={context} />,
+    };
   }
 }
 
-export function Category({ data, context }: Props) {
+export function CategoryHomePage({ data, context }: Props) {
+  const categoryListItems = Object.entries(data).map(([key, value]) => {
+    const categoryLinkUrl =
+      `${context.root}/${context.section.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`;
+
+    return (
+      <li>
+        <a href={categoryLinkUrl}>{key}</a>
+        <p>{value}</p>
+      </li>
+    );
+  });
+
   return (
-    <div>
-      <h1>I am a category: {data.name}</h1>
-      <ul>
-        {Object.entries(data).map(([key, value]) => (
-          <li key={key}>
-            {value
-              ? (
-                <>
-                  <a
-                    href={`${context.root}/${context.section.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`}
-                  >
-                    {key}
-                  </a>
-                  <p>
-                    {value}
-                  </p>
-                </>
-              )
-              : key}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ReferencePage>
+      <div>
+        <h1>I am a category: {data.name}</h1>
+        <ul>
+          {categoryListItems}
+        </ul>
+      </div>
+    </ReferencePage>
   );
 }
 
-export function CategoryListing({ data, context }: Props) {
-  // const itemsInThisCategory = context.dataCollection.filter((item) => item.jsDoc?.tag === data.name);
+type ListingProps = {
+  categoryName: string;
+  context: ReferenceContext;
+};
+
+export function SingleCategoryView({ categoryName, context }: ListingProps) {
+  const allItems = flattenItems(context.dataCollection);
+
+  const itemsInThisCategory = allItems.filter((item) =>
+    item.jsDoc?.tags?.some((tag) =>
+      tag.kind === "category" &&
+      tag.doc.toLocaleLowerCase() === categoryName?.toLocaleLowerCase()
+    )
+  );
+
+  const itemElements = itemsInThisCategory.map((item) => {
+    return (
+      <li>
+        <a href={`~/${item.fullName || item.name}`}>
+          {item.fullName || item.name}
+        </a>
+      </li>
+    );
+  });
 
   return (
-    <div>
-      <h1>I am a category listing page {data.name}</h1>
+    <ReferencePage>
+      <h1>I am a category listing page {categoryName}</h1>
       <ul>
-        <li>This is a list of all the APIs in this category</li>
+        {itemElements}
       </ul>
-    </div>
+    </ReferencePage>
   );
 }
