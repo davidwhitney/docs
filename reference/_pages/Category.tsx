@@ -8,6 +8,7 @@ import {
   ReferenceContext,
 } from "../types.ts";
 import { insertLinkCodes, LinkCode } from "./primatives/LinkCode.tsx";
+import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 
 type Props = {
   data: Record<string, string | undefined>;
@@ -101,7 +102,9 @@ export function SingleCategoryView({ categoryName, context }: ListingProps) {
       <main>
         <div className={"space-y-7"}>
           <section id={"Classes"} className={"section"}>
-            <h2 className={"anchorable mb-1"}>Classes</h2>
+            <div>
+              <AnchorableHeading text="Classes" anchor="Classes" />
+            </div>
           </section>
           <div className={"namespaceSection"}>
             <CategoryPageList items={classes} />
