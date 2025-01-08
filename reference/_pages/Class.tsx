@@ -12,7 +12,7 @@ export default function* getPages(
 
   yield {
     title: item.name,
-    url: `${context.root}/${context.section}/~/${prefix}${item.name}`,
+    url: `${context.root}/${context.section.toLocaleLowerCase()}/~/${prefix}${item.name}`,
     content: <Class data={item} context={context} />,
   };
 }
@@ -41,6 +41,14 @@ export function Class({ data, context }: Props) {
     );
   });
 
+  const properties = data.classDef.properties.map((property) => {
+    return (
+      <div>
+        <h3>{property.name}</h3>
+      </div>
+    );
+  });
+
   return (
     <div>
       <h1>Class: {fullName}</h1>
@@ -51,6 +59,7 @@ export function Class({ data, context }: Props) {
       {constructors && constructors}
 
       <h2>Properties</h2>
+      {properties && properties}
 
       <h2>Methods</h2>
 

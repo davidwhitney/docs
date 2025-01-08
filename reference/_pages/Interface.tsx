@@ -11,7 +11,7 @@ export default function* getPages(
 
   yield {
     title: item.name,
-    url: `${context.root}/${context.section}/~/${prefix}${item.name}`,
+    url: `${context.root}/${context.section.toLocaleLowerCase()}/~/${prefix}${item.name}`,
     content: <Interface data={item} context={context} />,
   };
 }

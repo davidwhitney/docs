@@ -10,7 +10,7 @@ export default function* getPages(
 ): IterableIterator<LumeDocument> {
   yield {
     title: item.name,
-    url: `${context.root}/${context.section}/${item.name.toLocaleLowerCase()}`,
+    url: `${context.root}/${context.section.toLocaleLowerCase()}/${item.name.toLocaleLowerCase()}`,
     content: <Namespace data={item} context={context} />,
   };
 

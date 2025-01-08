@@ -1,26 +1,24 @@
-import { DocNode, DocNodeModuleDoc } from "@deno/doc/types";
+import { DocNode, DocNodeImport } from "@deno/doc/types";
 import { LumeDocument, ReferenceContext } from "../types.ts";
 
 type Props = { data: DocNode };
 
 export default function* getPages(
-  item: DocNodeModuleDoc,
+  item: DocNodeImport,
   context: ReferenceContext,
 ): IterableIterator<LumeDocument> {
   yield {
     title: item.name,
     url:
-      `${context.root}/${context.section.toLocaleLowerCase()}/${item.name.toLocaleLowerCase()}`,
-    content: <Module data={item} />,
+      `${context.root}/${context.section.toLocaleLowerCase()}/${item.name.toLocaleLowerCase()}.import`,
+    content: <Import data={item} />,
   };
-
-  console.log("Module found", item);
 }
 
-export function Module({ data }: Props) {
+export function Import({ data }: Props) {
   return (
     <div>
-      I am a module, my name is {data.name}
+      I am a Import, my name is {data.name}
 
       <pre>
         {JSON.stringify(data, null, 2)}
