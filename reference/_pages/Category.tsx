@@ -67,6 +67,21 @@ export function SingleCategoryView({ categoryName, context }: ListingProps) {
     )
   );
 
+  const classes = itemsInThisCategory.filter((item) => item.kind === "class")
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const functions = itemsInThisCategory.filter((item) =>
+    item.kind === "function"
+  ).sort((a, b) => a.name.localeCompare(b.name));
+
+  const interfaces = itemsInThisCategory.filter((item) =>
+    item.kind === "interface"
+  ).sort((a, b) => a.name.localeCompare(b.name));
+
+  const typeAliases = itemsInThisCategory.filter((item) =>
+    item.kind === "typeAlias"
+  ).sort((a, b) => a.name.localeCompare(b.name));
+
   const itemElements = itemsInThisCategory.map((item) => {
     return (
       <li>
@@ -80,8 +95,50 @@ export function SingleCategoryView({ categoryName, context }: ListingProps) {
   return (
     <ReferencePage>
       <h1>I am a category listing page {categoryName}</h1>
+      <h2 className={"anchorable mb-1"}>Classes</h2>
+      <div className={"namespaceSection"}>
+        <ul>
+          {classes.map((item) => (
+            <li>
+              <a href={`~/${item.fullName || item.name}`}>
+                {item.fullName || item.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <h2 className={"anchorable mb-1"}>Functions</h2>
       <ul>
-        {itemElements}
+        {functions.map((item) => (
+          <li>
+            <a href={`~/${item.fullName || item.name}`}>
+              {item.fullName || item.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <h2 className={"anchorable mb-1"}>Interfaces</h2>
+      <ul>
+        {interfaces.map((item) => (
+          <li>
+            <a href={`~/${item.fullName || item.name}`}>
+              {item.fullName || item.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <h2 className={"anchorable mb-1"}>Type Aliases</h2>
+      <ul>
+        {typeAliases.map((item) => (
+          <li>
+            <a href={`~/${item.fullName || item.name}`}>
+              {item.fullName || item.name}
+            </a>
+          </li>
+        ))}
       </ul>
     </ReferencePage>
   );
