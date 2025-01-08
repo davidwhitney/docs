@@ -35,17 +35,18 @@ export default async function* () {
       throw new Error();
     }
 
-    for await (const { name, symbols } of getSymbols()) {
+    for await (const { packageName, symbols } of getSymbols()) {
       populateItemNamespaces(symbols);
+
+      const currentCategoryList = sections.filter((x) =>
+        x.path === packageName.toLocaleLowerCase()
+      )[0]!.categoryDocs as Record<string, string | undefined>;
 
       const context = {
         root,
-        section: name,
-        dataCollection: symbols,
-        parentName: "",
-        currentCategoryList: sections.filter((x) =>
-          x.path === name.toLocaleLowerCase()
-        )[0]!.categoryDocs as Record<string, string | undefined>,
+        packageName,
+        symbols,
+        currentCategoryList: currentCategoryList,
       };
 
       for (const p of getCategoryPages(context)) {
@@ -57,6 +58,11 @@ export default async function* () {
         const pages = generatePageFor(item, context);
 
         for await (const page of pages) {
+          if (page.url.endsWith("undefined")) {
+            console.error(`⚠️ Skipping invalid URL: ${page.url}!`, page);
+            throw new Error(`Invalid URL: ${page.url}`);
+          }
+
           if (generated.includes(page.url)) {
             console.warn(`⚠️ Skipping duplicate page: ${page.url}!`);
             continue;
@@ -64,6 +70,7 @@ export default async function* () {
 
           yield page;
           generated.push(page.url);
+          console.log("Generated", page.url);
         }
       }
     }

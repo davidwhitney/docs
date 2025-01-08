@@ -7,12 +7,16 @@ export type LumeDocument = {
     content: JSX.Element;
 }
 
-export type HasNamespace = {
+export interface HasFullName {
+    fullName: string;
+}
+
+export interface HasNamespace extends HasFullName {
     namespace: string;
     fullName: string;
 }
 
-export type MightHaveNamespace = {
+export interface MightHaveNamespace {
     namespace?: string;
     fullName?: string;
 }
@@ -33,9 +37,8 @@ export type Navigation = {
 
 export type ReferenceContext = {
     root: string;
-    section: string;
-    dataCollection: DocNode[];
-    parentName: string;
+    packageName: string;
+    symbols: DocNode[];
     currentCategoryList: Record<string, string | undefined>;
 }
 

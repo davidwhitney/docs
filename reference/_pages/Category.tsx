@@ -7,6 +7,7 @@ import {
   MightHaveNamespace,
   ReferenceContext,
 } from "../types.ts";
+import { insertLinkCodes, LinkCode } from "./primatives/LinkCode.tsx";
 
 type Props = {
   data: Record<string, string | undefined>;
@@ -17,8 +18,8 @@ export default function* getPages(
   context: ReferenceContext,
 ): IterableIterator<LumeDocument> {
   yield {
-    title: context.section,
-    url: `${context.root}/${context.section.toLocaleLowerCase()}/`,
+    title: context.packageName,
+    url: `${context.root}/${context.packageName.toLocaleLowerCase()}/`,
     content: (
       <CategoryHomePage data={context.currentCategoryList} context={context} />
     ),
@@ -28,7 +29,7 @@ export default function* getPages(
     yield {
       title: key,
       url:
-        `${context.root}/${context.section.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`,
+        `${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`,
       content: <SingleCategoryView categoryName={key} context={context} />,
     };
   }
@@ -37,7 +38,7 @@ export default function* getPages(
 export function CategoryHomePage({ data, context }: Props) {
   const categoryListItems = Object.entries(data).map(([key, value]) => {
     const categoryLinkUrl =
-      `${context.root}/${context.section.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`;
+      `${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`;
 
     return (
       <li>
@@ -65,7 +66,7 @@ type ListingProps = {
 };
 
 export function SingleCategoryView({ categoryName, context }: ListingProps) {
-  const allItems = flattenItems(context.dataCollection);
+  const allItems = flattenItems(context.symbols);
 
   const itemsInThisCategory = allItems.filter((item) =>
     item.jsDoc?.tags?.some((tag) =>
@@ -92,7 +93,10 @@ export function SingleCategoryView({ categoryName, context }: ListingProps) {
   return (
     <ReferencePage
       context={context}
-      navigation={{ category: context.section, currentItemName: categoryName }}
+      navigation={{
+        category: context.packageName,
+        currentItemName: categoryName,
+      }}
     >
       <main>
         <div className={"space-y-7"}>
@@ -129,6 +133,8 @@ function CategoryPageList(
     <ul className={"anchorable mb-1"}>
       {items.map((item) => {
         const displayName = item.fullName || item.name;
+        const firstLineOfJsDoc = item.jsDoc?.doc?.split("\n")[0] || "";
+        const descriptionWithLinkCode = insertLinkCodes(firstLineOfJsDoc);
 
         return (
           <li>
@@ -136,7 +142,7 @@ function CategoryPageList(
               {displayName}
             </a>
             <p>
-              {item.jsDoc?.doc || ""}
+              {descriptionWithLinkCode}
             </p>
             <MethodLinks item={item} />
           </li>
@@ -152,23 +158,33 @@ function MethodLinks({ item }: { item: DocNodeBase }) {
   }
 
   const asClass = item as DocNodeClass & HasNamespace;
-  const methods = asClass.classDef.methods;
-  const methodLinks = methods.map((method) => {
+  const methods = asClass.classDef.methods.sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
+  const filteredMethodsList = [
+    "[Symbol.dispose]",
+    "[Symbol.asyncDispose]",
+    "[Symbol.asyncIterator]",
+  ];
+
+  const filteredMethods = methods.filter((method) =>
+    !filteredMethodsList.includes(method.name)
+  );
+
+  const methodLinks = filteredMethods.map((method) => {
     return (
-      <>
-        <span>
-          <a href={`~/${asClass.fullName}.${method.name}`}>
-            {method.name}
-          </a>
-        </span>
-        &nbsp;
-      </>
+      <li>
+        <a href={`~/${asClass.fullName}.${method.name}`}>
+          {method.name}
+        </a>
+      </li>
     );
   });
 
   return (
-    <p>
+    <ul className={"namespaceItemContentSubItems"}>
       {methodLinks}
-    </p>
+    </ul>
   );
 }

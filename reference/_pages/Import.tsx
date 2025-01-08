@@ -11,7 +11,7 @@ export default function* getPages(
   yield {
     title: item.name,
     url:
-      `${context.root}/${context.section.toLocaleLowerCase()}/${item.name.toLocaleLowerCase()}.import`,
+      `${context.root}/${context.packageName.toLocaleLowerCase()}/${item.name.toLocaleLowerCase()}.import`,
     content: <Import data={item} context={context} />,
   };
 }
@@ -20,7 +20,7 @@ export function Import({ data, context }: Props) {
   return (
     <ReferencePage
       context={context}
-      navigation={{ category: context.section, currentItemName: data.name }}
+      navigation={{ category: context.packageName, currentItemName: data.name }}
     >
       I am a Import, my name is {data.name}
 

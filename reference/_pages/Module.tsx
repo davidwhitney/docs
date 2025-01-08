@@ -11,7 +11,7 @@ export default function* getPages(
   yield {
     title: item.name,
     url:
-      `${context.root}/${context.section.toLocaleLowerCase()}/${item.name.toLocaleLowerCase()}`,
+      `${context.root}/${context.packageName.toLocaleLowerCase()}/${item.name.toLocaleLowerCase()}`,
     content: <Module data={item} context={context} />,
   };
 
@@ -22,7 +22,7 @@ export function Module({ data, context }: Props) {
   return (
     <ReferencePage
       context={context}
-      navigation={{ category: context.section, currentItemName: data.name }}
+      navigation={{ category: context.packageName, currentItemName: data.name }}
     >
       I am a module, my name is {data.name}
 

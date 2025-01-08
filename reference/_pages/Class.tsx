@@ -1,28 +1,22 @@
 import { DocNodeClass } from "@deno/doc/types";
-import { LumeDocument, ReferenceContext } from "../types.ts";
+import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 
-type Props = { data: DocNodeClass; context: ReferenceContext };
+type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
 export default function* getPages(
-  item: DocNodeClass,
+  item: DocNodeClass & HasFullName,
   context: ReferenceContext,
 ): IterableIterator<LumeDocument> {
-  const prefix = context.parentName ? `${context.parentName}.` : "";
-
   yield {
     title: item.name,
     url:
-      `${context.root}/${context.section.toLocaleLowerCase()}/~/${prefix}${item.name}`,
+      `${context.root}/${context.packageName.toLocaleLowerCase()}/~/${item.fullName}`,
     content: <Class data={item} context={context} />,
   };
 }
 
 export function Class({ data, context }: Props) {
-  const fullName = context.parentName
-    ? `${context.parentName}.${data.name}`
-    : data.name;
-
   const isUnstable = data.jsDoc?.tags?.some((tag) =>
     tag.kind === "experimental" as string
   );
@@ -53,9 +47,12 @@ export function Class({ data, context }: Props) {
   return (
     <ReferencePage
       context={context}
-      navigation={{ category: context.section, currentItemName: fullName }}
+      navigation={{
+        category: context.packageName,
+        currentItemName: data.fullName,
+      }}
     >
-      <h1>Class: {fullName}</h1>
+      <h1>Class: {data.fullName}</h1>
       {isUnstable && <p>UNSTABLE</p>}
       {jsDocParagraphs && jsDocParagraphs}
 

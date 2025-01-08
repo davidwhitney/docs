@@ -7,15 +7,13 @@ export type Package = {
 }
 
 const packages = [
-    { name: "Web", files: ["./types/web.d.ts"], },
-    { name: "Deno", files: ["./types/deno.d.ts"], },
-    { name: "Node", files: await getNodeTypeFiles() },
+    { packageName: "Web", files: ["./types/web.d.ts"], },
+    { packageName: "Deno", files: ["./types/deno.d.ts"], },
+    { packageName: "Node", files: await getNodeTypeFiles() },
 ];
 
 export async function* getSymbols() {
-
-
-    for (const { name, files } of packages) {
+    for (const { packageName, files } of packages) {
         const paths = files.map((file) => {
             if (!file.startsWith("./")) {
                 return `file://${file}`;
@@ -29,7 +27,7 @@ export async function* getSymbols() {
 
         for (const sourceFile of Object.keys(docs)) {
             const symbols = docs[sourceFile];
-            yield { name, symbols };
+            yield { packageName, symbols };
         }
     }
 }

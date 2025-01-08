@@ -32,7 +32,7 @@ function CategoryPanel({ context }: { context: ReferenceContext }) {
 
   const categoryListItems = Object.entries(categories).map(([key, value]) => {
     const categoryLinkUrl =
-      `${context.root}/${context.section.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`;
+      `${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`;
 
     return (
       <li>
