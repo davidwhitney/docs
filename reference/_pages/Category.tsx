@@ -1,4 +1,4 @@
-import { DocNodeBase } from "@deno/doc/types";
+import { DocNodeBase, DocNodeClass } from "@deno/doc/types";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { flattenItems } from "../_util/common.ts";
 import {
@@ -7,6 +7,7 @@ import {
   MightHaveNamespace,
   ReferenceContext,
 } from "../types.ts";
+import { CHAR_NO_BREAK_SPACE } from "https://deno.land/std@0.170.0/path/_constants.ts";
 
 type Props = {
   data: Record<string, string | undefined>;
@@ -99,6 +100,9 @@ export function SingleCategoryView({ categoryName, context }: ListingProps) {
       <CategoryPageSection title={"Functions"} items={functions} />
       <CategoryPageSection title={"Interfaces"} items={interfaces} />
       <CategoryPageSection title={"Type Aliases"} items={typeAliases} />
+      <pre>
+        {JSON.stringify(itemsInThisCategory, null, 2)}
+      </pre>
     </ReferencePage>
   );
 }
@@ -134,10 +138,46 @@ function CategoryPageListItem(
       <a href={`~/${item.fullName || item.name}`}>
         <ItemName item={item} />
       </a>
+      <p>
+        {item.jsDoc?.doc || ""}
+      </p>
+      <p>
+        <pre>
+          {JSON.stringify(item, null, 2)}
+        </pre>
+      </p>
+      <MethodLinks item={item} />
     </li>
   );
 }
 
 function ItemName({ item }: { item: DocNodeBase & MightHaveNamespace }) {
   return <>{item.fullName || item.name}</>;
+}
+
+function MethodLinks({ item }: { item: DocNodeBase }) {
+  if (item.kind !== "class") {
+    return <></>;
+  }
+
+  const asClass = item as DocNodeClass & HasNamespace;
+  const methods = asClass.classDef.methods;
+  const methodLinks = methods.map((method) => {
+    return (
+      <>
+        <span>
+          <a href={`~/${asClass.fullName}.${method.name}`}>
+            {method.name}
+          </a>
+        </span>
+        &nbsp;
+      </>
+    );
+  });
+
+  return (
+    <p>
+      {methodLinks}
+    </p>
+  );
 }
