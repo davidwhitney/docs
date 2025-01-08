@@ -10,11 +10,7 @@ import {
 import { insertLinkCodes } from "./primatives/LinkCode.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 import { CodeIcon } from "./primatives/CodeIcon.tsx";
-
-type Props = {
-  data: Record<string, string | undefined>;
-  context: ReferenceContext;
-};
+import { Package } from "./Package.tsx";
 
 export default function* getPages(
   context: ReferenceContext,
@@ -22,9 +18,7 @@ export default function* getPages(
   yield {
     title: context.packageName,
     url: `${context.root}/${context.packageName.toLocaleLowerCase()}/`,
-    content: (
-      <CategoryHomePage data={context.currentCategoryList} context={context} />
-    ),
+    content: <Package data={context.currentCategoryList} context={context} />,
   };
 
   for (const [key] of Object.entries(context.currentCategoryList)) {
@@ -32,42 +26,9 @@ export default function* getPages(
       title: key,
       url:
         `${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`,
-      content: <SingleCategoryView categoryName={key} context={context} />,
+      content: <CategoryBrowse categoryName={key} context={context} />,
     };
   }
-}
-
-export function CategoryHomePage({ data, context }: Props) {
-  const categoryListItems = Object.entries(data).map(([key, value]) => {
-    return (
-      <CategoryListSection
-        title={key}
-        href={`${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`}
-        summary={value || ""}
-      />
-    );
-  });
-
-  return (
-    <ReferencePage
-      context={context}
-      navigation={{
-        category: context.packageName,
-        currentItemName: "",
-      }}
-    >
-      <main>
-        <section>
-          <div class="space-y-2 flex-1 ">
-            <div class="space-y-7" id="module_doc"></div>
-          </div>
-        </section>
-        <div className={"space-y-7"}>
-          {categoryListItems}
-        </div>
-      </main>
-    </ReferencePage>
-  );
 }
 
 type ListingProps = {
@@ -75,7 +36,7 @@ type ListingProps = {
   context: ReferenceContext;
 };
 
-export function SingleCategoryView({ categoryName, context }: ListingProps) {
+export function CategoryBrowse({ categoryName, context }: ListingProps) {
   const allItems = flattenItems(context.symbols);
 
   const itemsInThisCategory = allItems.filter((item) =>
@@ -117,41 +78,6 @@ export function SingleCategoryView({ categoryName, context }: ListingProps) {
         </div>
       </main>
     </ReferencePage>
-  );
-}
-
-function CategoryListSection(
-  { title, href, summary }: { title: string; href: string; summary: string },
-) {
-  const anchorId = title.replace(" ", "-").toLocaleLowerCase();
-
-  const parts = summary.split("\n\n");
-  const examplePart = parts[parts.length - 1];
-  const partsExceptLast = parts.slice(0, parts.length - 1);
-  const summaryBody = partsExceptLast.join("\n\n");
-
-  const exampleBody = insertLinkCodes(examplePart);
-  const summaryBodyParas = summaryBody.split("\n\n").map((paragraph) => (
-    <p>{paragraph}</p>
-  ));
-
-  return (
-    <section id={anchorId} className={"section"}>
-      <AnchorableHeading anchor={anchorId}>
-        <a href={href}>{title}</a>
-      </AnchorableHeading>
-      <div
-        data-color-mode="auto"
-        data-light-theme="light"
-        data-dark-theme="dark"
-        class="markdown-body"
-      >
-        {summaryBodyParas}
-        <p>
-          {exampleBody}
-        </p>
-      </div>
-    </section>
   );
 }
 
