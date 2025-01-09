@@ -1,9 +1,10 @@
 import React from "npm:@preact/compat";
-import { DocNodeClass, TsTypeDef } from "@deno/doc/types";
+import { ClassMethodDef, DocNodeClass, TsTypeDef } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 import { linkCodeAndParagraph } from "./primatives/LinkCode.tsx";
+import { methodParameter, methodSignature } from "../_util/methodSignatureRendering.ts";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -135,10 +136,12 @@ function Methods({ data }: { data: DocNodeClass }) {
     return <></>;
   }
 
-  const methodCollection = data.classDef.methods.map((method) => {
+  const items = data.classDef.methods.map((method) => {
     return (
       <div>
-        <h3>{method.name}</h3>
+        <div>
+          <MethodSignature method={method} />
+        </div>
         <MarkdownBody>
           {linkCodeAndParagraph(method.jsDoc?.doc || "")}
         </MarkdownBody>
@@ -148,8 +151,18 @@ function Methods({ data }: { data: DocNodeClass }) {
 
   return (
     <MemberSection title="Methods">
-      {methodCollection}
+      {items}
     </MemberSection>
+  );
+}
+
+function MethodSignature({ method }: { method: ClassMethodDef }) {
+  const asString = methodSignature(method);
+
+  return (
+    <>
+      {asString}
+    </>
   );
 }
 
@@ -158,7 +171,7 @@ function Properties({ data }: { data: DocNodeClass }) {
     return <></>;
   }
 
-  const methodCollection = data.classDef.properties.map((prop) => {
+  const items = data.classDef.properties.map((prop) => {
     return (
       <div>
         <h3>{prop.name}</h3>
@@ -171,7 +184,7 @@ function Properties({ data }: { data: DocNodeClass }) {
 
   return (
     <MemberSection title="Properties">
-      {methodCollection}
+      {items}
     </MemberSection>
   );
 }
