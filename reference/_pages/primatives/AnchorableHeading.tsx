@@ -28,7 +28,7 @@ export function AnchorableHeading(
               </path>
             </g>
             <defs>
-              <clipPath id={anchorValue}>
+              <clipPath id={anchorValue + "-clip"}>
                 <rect width="14" height="14" fill="white"></rect>
               </clipPath>
             </defs>

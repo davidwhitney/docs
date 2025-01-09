@@ -48,24 +48,12 @@ export function Class({ data, context }: Props) {
             </div>
             <div>
               <Description data={data} />
+              <Constructors data={data} />
+              <Methods data={data} />
+              <Properties data={data} />
 
-              <div className={"space-y-7"}>
-                <section id={"methods"} className={"section"}>
-                  <AnchorableHeading anchor="methods">
-                    Methods
-                  </AnchorableHeading>
-                </section>
-              </div>
+              <h2>Static Methods</h2>
             </div>
-
-            <Constructors data={data} />
-
-            <h2>Properties</h2>
-            {properties && properties}
-
-            <h2>Methods</h2>
-
-            <h2>Static Methods</h2>
           </article>
         </main>
       </div>
@@ -142,6 +130,52 @@ function Description({ data }: { data: DocNodeClass }) {
   );
 }
 
+function Methods({ data }: { data: DocNodeClass }) {
+  if (data.classDef.methods.length === 0) {
+    return <></>;
+  }
+
+  const methodCollection = data.classDef.methods.map((method) => {
+    return (
+      <div>
+        <h3>{method.name}</h3>
+        <MarkdownBody>
+          {linkCodeAndParagraph(method.jsDoc?.doc || "")}
+        </MarkdownBody>
+      </div>
+    );
+  });
+
+  return (
+    <MemberSection title="Methods">
+      {methodCollection}
+    </MemberSection>
+  );
+}
+
+function Properties({ data }: { data: DocNodeClass }) {
+  if (data.classDef.properties.length === 0) {
+    return <></>;
+  }
+
+  const methodCollection = data.classDef.properties.map((prop) => {
+    return (
+      <div>
+        <h3>{prop.name}</h3>
+        <MarkdownBody>
+          {linkCodeAndParagraph(prop.jsDoc?.doc || "")}
+        </MarkdownBody>
+      </div>
+    );
+  });
+
+  return (
+    <MemberSection title="Properties">
+      {methodCollection}
+    </MemberSection>
+  );
+}
+
 function Constructors({ data }: { data: DocNodeClass }) {
   if (data.classDef.constructors.length === 0) {
     return <></>;
@@ -156,15 +190,32 @@ function Constructors({ data }: { data: DocNodeClass }) {
   );
 }
 
+function MarkdownBody(
+  { children }: { children: React.ReactNode },
+) {
+  return (
+    <div class="max-w-[75ch]">
+      <div
+        data-color-mode="auto"
+        data-light-theme="light"
+        data-dark-theme="dark"
+        class="markdown-body"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function MemberSection(
   { title, children }: { title: string; children: React.ReactNode },
 ) {
   return (
     <div>
       <div className={"space-y-7"}>
-        <section id={title} className={"section"}>
+        <section className={"section"}>
           <AnchorableHeading anchor={title}>
-            Methods
+            {title}
           </AnchorableHeading>
         </section>
       </div>

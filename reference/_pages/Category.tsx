@@ -141,7 +141,7 @@ function MethodLinks({ item }: { item: DocNodeBase }) {
   const methodLinks = filteredMethods.map((method) => {
     return (
       <li>
-        <a href={`~/${asClass.fullName}.${method.name}`}>
+        <a href={`~/${asClass.fullName}#${method.name}`}>
           {method.name}
         </a>
       </li>
