@@ -1,6 +1,5 @@
 export function LinkCode({ symbol }: { symbol: string }) {
-  const root = symbol.split(".")[0];
-  const target = "/api/" + root + "/~/" + symbol;
+  const target = "~/" + symbol;
 
   return (
     <a href={target}>
