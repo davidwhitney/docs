@@ -1,12 +1,9 @@
 import React from "npm:@preact/compat";
-import { DocNodeClass } from "@deno/doc/types";
+import { DocNodeClass, TsTypeDef } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
-import {
-  insertLinkCodes,
-  linkCodeAndParagraph,
-} from "./primatives/LinkCode.tsx";
+import { linkCodeAndParagraph } from "./primatives/LinkCode.tsx";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -23,22 +20,6 @@ export default function* getPages(
 }
 
 export function Class({ data, context }: Props) {
-  const isUnstable = data.jsDoc?.tags?.some((tag) =>
-    tag.kind === "experimental" as string
-  );
-
-  const description = linkCodeAndParagraph(data.jsDoc?.doc || "");
-
-  const constructors = data.classDef.constructors.map((constructor) => {
-    return (
-      <MemberSection title="Constructors">
-        <pre>
-          {JSON.stringify(constructor, null, 2)}
-        </pre>
-      </MemberSection>
-    );
-  });
-
   const properties = data.classDef.properties.map((property) => {
     return (
       <div>
@@ -60,19 +41,14 @@ export function Class({ data, context }: Props) {
           <article>
             <div>
               <div>
-                <div className={"text-2xl leading-none break-all"}>
-                  <span class="text-Class">class</span>
-                  <span class="font-bold">
-                    &nbsp;
-                    {data.fullName}
-                  </span>
-                </div>
-                <div className={"symbolSubtitle"}>
-                  {isUnstable && <>UNSTABLE</>}
-                </div>
+                <ClassNameHeading data={data} />
+                <ImplementsSummary _implements={data.classDef.implements} />
+                <StabilitySummary data={data} />
               </div>
             </div>
             <div>
+              <Description data={data} />
+
               <div className={"space-y-7"}>
                 <section id={"methods"} className={"section"}>
                   <AnchorableHeading anchor="methods">
@@ -82,18 +58,7 @@ export function Class({ data, context }: Props) {
               </div>
             </div>
 
-            <div className={"space-y-7"}>
-              <div
-                data-color-mode="auto"
-                data-light-theme="light"
-                data-dark-theme="dark"
-                class="markdown-body"
-              >
-                {description && description}
-              </div>
-            </div>
-
-            {constructors && constructors}
+            <Constructors data={data} />
 
             <h2>Properties</h2>
             {properties && properties}
@@ -105,6 +70,89 @@ export function Class({ data, context }: Props) {
         </main>
       </div>
     </ReferencePage>
+  );
+}
+
+function ClassNameHeading({ data }: { data: DocNodeClass & HasFullName }) {
+  return (
+    <div className={"text-2xl leading-none break-all"}>
+      <span class="text-Class">class</span>
+      <span class="font-bold">
+        &nbsp;
+        {data.fullName}
+      </span>
+    </div>
+  );
+}
+
+function StabilitySummary({ data }: { data: DocNodeClass }) {
+  const isUnstable = data.jsDoc?.tags?.some((tag) =>
+    tag.kind === "experimental" as string
+  );
+
+  if (!isUnstable) {
+    return null;
+  }
+
+  return (
+    <div class="space-x-2 !mt-2">
+      <div class="text-unstable border border-unstable/50 bg-unstable/5 inline-flex items-center gap-0.5 *:flex-none rounded-md leading-none font-bold py-2 px-3">
+        Unstable
+      </div>
+    </div>
+  );
+}
+
+function ImplementsSummary({ _implements }: { _implements: TsTypeDef[] }) {
+  if (_implements.length === 0) {
+    return null;
+  }
+
+  const spans = _implements.map((iface) => {
+    return <span>{iface.repr}</span>;
+  });
+
+  return (
+    <div class="symbolSubtitle">
+      <div>
+        <span class="type">implements</span>
+        {spans}
+      </div>
+    </div>
+  );
+}
+
+function Description({ data }: { data: DocNodeClass }) {
+  const description = linkCodeAndParagraph(data.jsDoc?.doc || "") || [];
+  if (description.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className={"space-y-7"}>
+      <div
+        data-color-mode="auto"
+        data-light-theme="light"
+        data-dark-theme="dark"
+        class="markdown-body"
+      >
+        {description && description}
+      </div>
+    </div>
+  );
+}
+
+function Constructors({ data }: { data: DocNodeClass }) {
+  if (data.classDef.constructors.length === 0) {
+    return <></>;
+  }
+
+  return (
+    <MemberSection title="Constructors">
+      <pre>
+        {JSON.stringify(data.classDef.constructors, null, 2)}
+      </pre>
+    </MemberSection>
   );
 }
 

@@ -59,11 +59,6 @@ export default async function* () {
         const pages = generatePageFor(item, context);
 
         for await (const page of pages) {
-          if (page.url.endsWith("undefined")) {
-            console.error(`⚠️ Skipping invalid URL: ${page.url}!`, page);
-            throw new Error(`Invalid URL: ${page.url}`);
-          }
-
           if (generated.includes(page.url)) {
             console.warn(`⚠️ Skipping duplicate page: ${page.url}!`);
             continue;
