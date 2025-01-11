@@ -1,10 +1,18 @@
 import React from "npm:@preact/compat";
-import { ClassMethodDef, DocNodeClass, TsTypeDef } from "@deno/doc/types";
+import {
+  ClassMethodDef,
+  ClassPropertyDef,
+  DocNodeClass,
+  TsTypeDef,
+} from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 import { linkCodeAndParagraph } from "./primatives/LinkCode.tsx";
-import { methodSignature } from "../_util/methodSignatureRendering.ts";
+import {
+  methodSignature,
+  typeInformation,
+} from "../_util/methodSignatureRendering.ts";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -21,14 +29,6 @@ export default function* getPages(
 }
 
 export function Class({ data, context }: Props) {
-  const properties = data.classDef.properties.map((property) => {
-    return (
-      <div>
-        <h3>{property.name}</h3>
-      </div>
-    );
-  });
-
   return (
     <ReferencePage
       context={context}
@@ -50,8 +50,8 @@ export function Class({ data, context }: Props) {
             <div>
               <Description data={data} />
               <Constructors data={data} />
-              <Methods data={data} />
               <Properties data={data} />
+              <Methods data={data} />
 
               <h2>Static Methods</h2>
             </div>
@@ -161,7 +161,25 @@ function MethodSignature({ method }: { method: ClassMethodDef }) {
 
   const partElements = [];
   for (const part of asParts) {
+    if (
+      part.kind === "method-brace" && part.value.trim() === ")" &&
+      method.functionDef.params.length > 1
+    ) {
+      partElements.push(<br />);
+    }
+
     partElements.push(<span className={part.kind}>{part.value}</span>);
+
+    if (
+      part.kind === "method-brace" && part.value.trim() === "(" &&
+      method.functionDef.params.length > 1
+    ) {
+      partElements.push(<br />);
+    }
+
+    if (part.kind === "param-separator") {
+      partElements.push(<br />);
+    }
   }
 
   return (
@@ -179,7 +197,9 @@ function Properties({ data }: { data: DocNodeClass }) {
   const items = data.classDef.properties.map((prop) => {
     return (
       <div>
-        <h3>{prop.name}</h3>
+        <h3>
+          <PropertyName property={prop} />
+        </h3>
         <MarkdownBody>
           {linkCodeAndParagraph(prop.jsDoc?.doc || "")}
         </MarkdownBody>
@@ -191,6 +211,23 @@ function Properties({ data }: { data: DocNodeClass }) {
     <MemberSection title="Properties">
       {items}
     </MemberSection>
+  );
+}
+
+function PropertyName({ property }: { property: ClassPropertyDef }) {
+  if (property.name === "readable") {
+    console.log(property);
+  }
+
+  const typeInfoElements = typeInformation(property.tsType).map((part) => {
+    return <span className={part.kind}>{part.value}</span>;
+  });
+
+  return (
+    <>
+      <span className={"identifier"}>{property.name}</span>
+      {typeInfoElements}
+    </>
   );
 }
 
