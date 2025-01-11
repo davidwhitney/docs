@@ -13,6 +13,8 @@ import {
   methodSignature,
   typeInformation,
 } from "../_util/methodSignatureRendering.ts";
+import markdown from "lume/plugins/markdown.ts";
+import { markdownRenderer } from "../../_config.markdown.ts";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -112,7 +114,10 @@ function ImplementsSummary({ _implements }: { _implements: TsTypeDef[] }) {
 }
 
 function Description({ data }: { data: DocNodeClass }) {
-  const description = linkCodeAndParagraph(data.jsDoc?.doc || "") || [];
+  const content = data.jsDoc?.doc || "";
+  const renderedDescription = markdownRenderer().render(content);
+  const description = linkCodeAndParagraph(renderedDescription) || [];
+
   if (description.length === 0) {
     return null;
   }
@@ -125,7 +130,7 @@ function Description({ data }: { data: DocNodeClass }) {
         data-dark-theme="dark"
         class="markdown-body"
       >
-        {description && description}
+        {description}
       </div>
     </div>
   );
