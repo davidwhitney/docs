@@ -8,12 +8,12 @@ import {
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
-import { linkCodeAndParagraph } from "./primatives/LinkCode.tsx";
 import {
   methodSignature,
   typeInformation,
 } from "../_util/methodSignatureRendering.ts";
 import { markdownRenderer } from "../../_config.markdown.ts";
+import { MarkdownContent } from "./primatives/MarkdownContent.tsx";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -113,25 +113,14 @@ function ImplementsSummary({ _implements }: { _implements: TsTypeDef[] }) {
 }
 
 function Description({ data }: { data: DocNodeClass }) {
-  const content = data.jsDoc?.doc || "";
-  const renderedDescription = markdownRenderer.render(content);
-  const description = linkCodeAndParagraph(renderedDescription) || [];
-
-  if (description.length === 0) {
+  if (!data.jsDoc?.doc) {
     return null;
   }
 
   return (
-    <div className={"space-y-7"}>
-      <div
-        data-color-mode="auto"
-        data-light-theme="light"
-        data-dark-theme="dark"
-        class="markdown-body"
-      >
-        {description}
-      </div>
-    </div>
+    <DetailedSection>
+      <MarkdownContent text={data.jsDoc?.doc || ""} />
+    </DetailedSection>
   );
 }
 
@@ -146,9 +135,9 @@ function Methods({ data }: { data: DocNodeClass }) {
         <div>
           <MethodSignature method={method} />
         </div>
-        <MarkdownBody>
-          {linkCodeAndParagraph(method.jsDoc?.doc || "")}
-        </MarkdownBody>
+        <DetailedSection>
+          <MarkdownContent text={method.jsDoc?.doc || ""} />
+        </DetailedSection>
       </div>
     );
   });
@@ -204,9 +193,9 @@ function Properties({ data }: { data: DocNodeClass }) {
         <h3>
           <PropertyName property={prop} />
         </h3>
-        <MarkdownBody>
-          {linkCodeAndParagraph(prop.jsDoc?.doc || "")}
-        </MarkdownBody>
+        <DetailedSection>
+          <MarkdownContent text={prop.jsDoc?.doc} />
+        </DetailedSection>
       </div>
     );
   });
@@ -249,9 +238,7 @@ function Constructors({ data }: { data: DocNodeClass }) {
   );
 }
 
-function MarkdownBody(
-  { children }: { children: React.ReactNode },
-) {
+function DetailedSection({ children }: { children: React.ReactNode }) {
   return (
     <div class="max-w-[75ch]">
       <div

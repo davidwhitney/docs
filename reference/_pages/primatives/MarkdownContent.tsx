@@ -1,9 +1,25 @@
 import { markdownRenderer } from "../../../_config.markdown.ts";
-import { RawHtml } from "./RawHtml.tsx";
+import { insertLinkCodes } from "./LinkCode.tsx";
 
-export function MarkdownContext(
-  { text }: { text: string },
+export function MarkdownContent(
+  { text }: { text: string | undefined | null },
 ) {
+  if (!text) {
+    return null;
+  }
+
   const renderedDescription = markdownRenderer.render(text);
-  return <RawHtml rendered={renderedDescription} />;
+  const withLinkCode = insertLinkCodes(renderedDescription);
+
+  const paragraphs = withLinkCode
+    .split(/\n\n+/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
+
+  const elements = paragraphs.map((paragraph, index) => (
+    <p key={index} dangerouslySetInnerHTML={{ __html: paragraph }}>
+    </p>
+  ));
+
+  return <>{elements}</>;
 }
