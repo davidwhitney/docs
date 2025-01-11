@@ -4,7 +4,7 @@ import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 import { linkCodeAndParagraph } from "./primatives/LinkCode.tsx";
-import { methodParameter, methodSignature } from "../_util/methodSignatureRendering.ts";
+import { methodSignature } from "../_util/methodSignatureRendering.ts";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -157,11 +157,16 @@ function Methods({ data }: { data: DocNodeClass }) {
 }
 
 function MethodSignature({ method }: { method: ClassMethodDef }) {
-  const asString = methodSignature(method);
+  const asParts = methodSignature(method);
+
+  const partElements = [];
+  for (const part of asParts) {
+    partElements.push(<span className={part.kind}>{part.value}</span>);
+  }
 
   return (
     <>
-      {asString}
+      {partElements}
     </>
   );
 }
