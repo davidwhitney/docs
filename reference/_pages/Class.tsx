@@ -12,7 +12,6 @@ import {
   methodSignature,
   typeInformation,
 } from "../_util/methodSignatureRendering.ts";
-import { markdownRenderer } from "../../_config.markdown.ts";
 import { MarkdownContent } from "./primatives/MarkdownContent.tsx";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
@@ -30,6 +29,13 @@ export default function* getPages(
 }
 
 export function Class({ data, context }: Props) {
+  const instanceMethods = data.classDef.methods.filter((method) =>
+    !method.isStatic
+  );
+  const staticMethods = data.classDef.methods.filter((method) =>
+    method.isStatic
+  );
+
   return (
     <ReferencePage
       context={context}
@@ -52,9 +58,8 @@ export function Class({ data, context }: Props) {
               <Description data={data} />
               <Constructors data={data} />
               <Properties data={data} />
-              <Methods data={data} />
-
-              <h2>Static Methods</h2>
+              <Methods methods={instanceMethods} />
+              <Methods methods={staticMethods} label={"Static Methods"} />
             </div>
           </article>
         </main>
@@ -124,12 +129,14 @@ function Description({ data }: { data: DocNodeClass }) {
   );
 }
 
-function Methods({ data }: { data: DocNodeClass }) {
-  if (data.classDef.methods.length === 0) {
+function Methods(
+  { methods, label = "Methods" }: { methods: ClassMethodDef[]; label?: string },
+) {
+  if (methods.length === 0) {
     return <></>;
   }
 
-  const items = data.classDef.methods.map((method) => {
+  const items = methods.map((method) => {
     return (
       <div>
         <div>
@@ -143,7 +150,7 @@ function Methods({ data }: { data: DocNodeClass }) {
   });
 
   return (
-    <MemberSection title="Methods">
+    <MemberSection title={label}>
       {items}
     </MemberSection>
   );
@@ -187,31 +194,27 @@ function Properties({ data }: { data: DocNodeClass }) {
     return <></>;
   }
 
-  const items = data.classDef.properties.map((prop) => {
-    return (
-      <div>
-        <h3>
-          <PropertyName property={prop} />
-        </h3>
-        <DetailedSection>
-          <MarkdownContent text={prop.jsDoc?.doc} />
-        </DetailedSection>
-      </div>
-    );
-  });
-
   return (
     <MemberSection title="Properties">
-      {items}
+      {data.classDef.properties.map((prop) => <PropertyItem property={prop} />)}
     </MemberSection>
   );
 }
 
-function PropertyName({ property }: { property: ClassPropertyDef }) {
-  if (property.name === "readable") {
-    console.log(property);
-  }
+function PropertyItem({ property }: { property: ClassPropertyDef }) {
+  return (
+    <div>
+      <h3>
+        <PropertyName property={property} />
+      </h3>
+      <DetailedSection>
+        <MarkdownContent text={property.jsDoc?.doc} />
+      </DetailedSection>
+    </div>
+  );
+}
 
+function PropertyName({ property }: { property: ClassPropertyDef }) {
   const typeInfoElements = typeInformation(property.tsType).map((part) => {
     return <span className={part.kind}>{part.value}</span>;
   });
@@ -219,6 +222,7 @@ function PropertyName({ property }: { property: ClassPropertyDef }) {
   return (
     <>
       <span className={"identifier"}>{property.name}</span>
+      <span className={"type"}>:</span>
       {typeInfoElements}
     </>
   );
