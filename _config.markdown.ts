@@ -47,8 +47,6 @@ export const options: MarkdownItOptions = {
     },
 };
 
-export function markdownRenderer() {
-    return markdownit(options).use(...plugins);
-}
+export const markdownRenderer = markdownit(options).use(...plugins);
 
 export default { plugins, options };
