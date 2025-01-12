@@ -1,5 +1,5 @@
 import { FunctionDef } from "@deno/doc/types";
-import { functionSignature } from "../../_util/methodSignatureRendering.ts";
+import { functionSignature } from "../../_util/symbolStringBuilding.ts";
 import { FunctionDefinitionParts } from "./FunctionDefinitionParts.tsx";
 
 export function FunctionSignature(

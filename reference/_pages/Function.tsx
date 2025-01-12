@@ -21,8 +21,6 @@ export default function* getPages(
 }
 
 export function Function({ data, context }: Props) {
-  console.log(data);
-
   const nameOnly = data.fullName.split(".").pop();
 
   return (

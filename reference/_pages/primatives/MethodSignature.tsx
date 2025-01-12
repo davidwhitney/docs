@@ -1,5 +1,5 @@
 import { ClassMethodDef } from "@deno/doc/types";
-import { methodSignature } from "../../_util/methodSignatureRendering.ts";
+import { methodSignature } from "../../_util/symbolStringBuilding.ts";
 import { FunctionDefinitionParts } from "./FunctionDefinitionParts.tsx";
 
 export function MethodSignature({ method }: { method: ClassMethodDef }) {

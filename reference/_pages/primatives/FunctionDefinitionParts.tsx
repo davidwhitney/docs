@@ -1,4 +1,4 @@
-import { CodePart } from "../../_util/methodSignatureRendering.ts";
+import { CodePart } from "../../_util/symbolStringBuilding.ts";
 
 export function FunctionDefinitionParts(
   { asParts, forceLineBreaks = false }: {

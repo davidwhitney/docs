@@ -1,4 +1,5 @@
 import { ClassMethodDef, FunctionDef, LiteralPropertyDef, ParamDef, ParamIdentifierDef, ParamRestDef, TsTypeDef } from "@deno/doc/types";
+import { youtubereporting } from "googleapis";
 
 export type CodePart = {
     value: string;
@@ -37,7 +38,7 @@ export function functionSignature(functionDef: FunctionDef, nameOverride: string
         parts.push({ value: "(", kind: "method-brace" });
 
         const params = functionDef.params.map((param) => (
-            methodParameter(param)
+            parameter(param)
         ));
 
         for (const param of params) {
@@ -60,7 +61,7 @@ export function functionSignature(functionDef: FunctionDef, nameOverride: string
     return parts;
 }
 
-export function methodParameter(param: ParamDef): CodePart[] {
+export function parameter(param: ParamDef): CodePart[] {
     const parts: CodePart[] = [];
 
     if (param.kind === "rest") {
@@ -83,7 +84,7 @@ export function restParameter(param: ParamRestDef): CodePart[] {
     param.arg.tsType = param.tsType; // Fix bug where TSType is not populated.
 
     parts.push({ value: "...", kind: "identifier" });
-    parts.push(...methodParameter(param.arg));
+    parts.push(...parameter(param.arg));
     return parts;
 }
 
@@ -172,6 +173,23 @@ export function typeInformation(type: TsTypeDef | undefined): CodePart[] {
         parts.push({ value: "(", kind: "brackets" });
         parts.push(...typeInformation(type.parenthesized));
         parts.push({ value: ")", kind: "brackets" });
+    }
+
+    if (type.kind === "fnOrConstructor") {
+        parts.push({ value: "(", kind: "brackets" });
+
+        if (type.fnOrConstructor.params.length > 0) {
+            for (const param of type.fnOrConstructor.params) {
+                parts.push(...parameter(param));
+                parts.push({ value: ", ", kind: "separator" });
+            }
+
+            parts.pop(); // remove last separator
+        }
+
+        parts.push({ value: ")", kind: "brackets" });
+        parts.push({ value: " => ", kind: "separator" });
+        parts.push(...typeInformation(type.fnOrConstructor.tsType));
     }
 
     return parts;
