@@ -1,5 +1,4 @@
 import { ClassMethodDef, FunctionDef, LiteralPropertyDef, ParamDef, ParamIdentifierDef, ParamRestDef, TsTypeDef } from "@deno/doc/types";
-import { youtubereporting } from "googleapis";
 
 export type CodePart = {
     value: string;
