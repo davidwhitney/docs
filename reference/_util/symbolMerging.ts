@@ -53,6 +53,7 @@ export function mergeSymbolsWithCollidingNames(symbolsByName: Map<string, (DocNo
 }
 
 
+// deno-lint-ignore no-explicit-any
 function mergeSymbolCollections(matchingSymbols: any[]) {
     if (matchingSymbols.length < 2) {
         return;
