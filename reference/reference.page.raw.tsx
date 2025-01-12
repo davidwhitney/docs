@@ -9,6 +9,8 @@ import denoCategoryDocs from "./_categories/deno-categories.json" with {
   type: "json",
 };
 import { DocNode } from "@deno/doc/types";
+import { HasNamespace } from "./types.ts";
+import { mergeSymbolsWithCollidingNames } from "./_util/symbolMerging.ts";
 
 export const layout = "raw.tsx";
 
@@ -29,6 +31,7 @@ export const sidebar = [
 ];
 
 const generated: string[] = [];
+let skipped = 0;
 
 export default async function* () {
   try {
@@ -39,8 +42,6 @@ export default async function* () {
     const allSymbols = await getAllSymbols();
 
     for (const [packageName, symbols] of allSymbols.entries()) {
-      const cleanedSymbols = populateItemNamespaces(symbols) as DocNode[];
-
       const currentCategoryList = sections.filter((x) =>
         x.path === packageName.toLocaleLowerCase()
       )[0]!.categoryDocs as Record<string, string | undefined>;
@@ -48,7 +49,7 @@ export default async function* () {
       const context = {
         root,
         packageName,
-        symbols: cleanedSymbols,
+        symbols,
         currentCategoryList: currentCategoryList,
       };
 
@@ -57,18 +58,18 @@ export default async function* () {
         generated.push(p.url);
       }
 
-      for (const item of cleanedSymbols) {
+      for (const item of symbols) {
         const pages = generatePageFor(item, context);
 
         for await (const page of pages) {
           if (generated.includes(page.url)) {
             console.warn(`⚠️ Skipping duplicate page: ${page.url}!`);
+            skipped++;
             continue;
           }
 
           yield page;
           generated.push(page.url);
-          console.log("Generated", page.url);
         }
       }
     }
@@ -76,53 +77,33 @@ export default async function* () {
     console.warn("⚠️ Reference docs were not generated." + ex);
   }
 
-  console.log("Generated", generated.length, "reference pages");
+  console.log(
+    "Generated",
+    generated.length,
+    "reference pages",
+    skipped,
+    "skipped",
+  );
 }
 
 async function getAllSymbols() {
   const allSymbols = new Map<string, DocNode[]>();
   for await (const { packageName, symbols } of getSymbols()) {
-    // Group symbols by name
-    const symbolsByName = new Map<string, DocNode[]>();
+    const cleanedSymbols = populateItemNamespaces(
+      symbols,
+    ) as (DocNode & HasNamespace)[];
 
-    for (const symbol of symbols) {
-      const existing = symbolsByName.get(symbol.name) || [];
+    const symbolsByName = new Map<string, (DocNode & HasNamespace)[]>();
+
+    for (const symbol of cleanedSymbols) {
+      const existing = symbolsByName.get(symbol.fullName) || [];
       symbolsByName.set(symbol.name, [...existing, symbol]);
     }
 
-    // Merge symbols with same name
-    const mergedSymbols = Array.from(symbolsByName.values()).map((items) => {
-      if (items.length === 1) {
-        return items[0];
-      }
-
-      // Sort by priority (class > interface > other)
-      const sorted = items.sort((a, b) => {
-        if (a.kind === "class") return -1;
-        if (b.kind === "class") return 1;
-        if (a.kind === "interface") return -1;
-        if (b.kind === "interface") return 1;
-        return 0;
-      });
-
-      // Merge docs if available
-      const primary = sorted[0];
-      const jsDoc = sorted
-        .map((s) => s.jsDoc?.doc)
-        .filter(Boolean)
-        .join("\n\n");
-
-      if (jsDoc) {
-        primary.jsDoc = { ...primary.jsDoc, doc: jsDoc };
-      }
-
-      return primary;
-    });
+    const mergedSymbols = mergeSymbolsWithCollidingNames(symbolsByName);
 
     allSymbols.set(packageName, mergedSymbols);
   }
-
-  // TODO: merge symbols that share names here
 
   return allSymbols;
 }

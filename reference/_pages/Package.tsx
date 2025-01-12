@@ -1,3 +1,4 @@
+import { JsDocTag, JsDocTagDoc } from "@deno/doc/types";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { ReferenceContext } from "../types.ts";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
@@ -9,7 +10,18 @@ type Props = {
 };
 
 export function Package({ data, context }: Props) {
-  const categoryListItems = Object.entries(data).map(([key, value]) => {
+  const allCategoriesFromJsDocTags = context.symbols.map((item) =>
+    item.jsDoc?.tags?.filter((tag) => tag.kind === "category")
+  ).flat() as JsDocTagDoc[];
+
+  const categoryListItems = allCategoriesFromJsDocTags.map((tag) => {
+    if (!tag.doc) {
+      return null;
+    }
+
+    const key = tag.doc;
+    const value = data[key];
+
     return (
       <CategoryListSection
         title={key}
