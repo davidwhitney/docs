@@ -1,4 +1,4 @@
-import { ClassMethodDef, LiteralPropertyDef, ParamDef, ParamIdentifierDef, ParamRestDef, TsTypeDef } from "@deno/doc/types";
+import { ClassMethodDef, FunctionDef, LiteralPropertyDef, ParamDef, ParamIdentifierDef, ParamRestDef, TsTypeDef } from "@deno/doc/types";
 
 export type CodePart = {
     value: string;
@@ -23,12 +23,20 @@ export function methodSignature(method: ClassMethodDef) {
         parts.push({ value: "override ", kind: "modifier" });
     }
 
-    parts.push({ value: method.functionDef.defName || method.name, kind: "name" });
+    parts.push(...functionSignature(method.functionDef, method.name));
 
-    if (method.functionDef.params.length > 0) {
+    return parts;
+}
+
+export function functionSignature(functionDef: FunctionDef, nameOverride: string | undefined = undefined) {
+    const parts: CodePart[] = [];
+
+    parts.push({ value: functionDef.defName || nameOverride || "", kind: "name" });
+
+    if (functionDef.params.length > 0) {
         parts.push({ value: "(", kind: "method-brace" });
 
-        const params = method.functionDef.params.map((param) => (
+        const params = functionDef.params.map((param) => (
             methodParameter(param)
         ));
 
@@ -44,9 +52,9 @@ export function methodSignature(method: ClassMethodDef) {
         parts.push({ value: "()", kind: "brackets" });
     }
 
-    if (method.functionDef.returnType) {
+    if (functionDef.returnType) {
         parts.push({ value: ": ", kind: "type" });
-        parts.push(...typeInformation(method.functionDef.returnType));
+        parts.push(...typeInformation(functionDef.returnType));
     }
 
     return parts;

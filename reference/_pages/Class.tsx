@@ -3,14 +3,11 @@ import {
   ClassMethodDef,
   ClassPropertyDef,
   DocNodeClass,
-  JsDoc,
-  TsTypeDef,
 } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 import { MarkdownContent } from "./primatives/MarkdownContent.tsx";
-import { nbsp } from "../_util/common.ts";
 import {
   TableOfContents,
   TocListItem,
@@ -18,8 +15,11 @@ import {
 } from "./primatives/TableOfContents.tsx";
 import { PropertyName } from "./primatives/PropertyName.tsx";
 import { MethodSignature } from "./primatives/MethodSignature.tsx";
-import { TypeSummary } from "./primatives/TypeSummary.tsx";
-import { typeInformation } from "../_util/methodSignatureRendering.ts";
+import { NameHeading } from "./primatives/NameHeading.tsx";
+import { StabilitySummary } from "./primatives/StabilitySummary.tsx";
+import { ImplementsSummary } from "./primatives/ImplementsSummary.tsx";
+import { JsDocDescription } from "./primatives/JsDocDescription.tsx";
+import { DetailedSection } from "./primatives/DetailedSection.tsx";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -56,13 +56,13 @@ export function Class({ data, context }: Props) {
           <article>
             <div>
               <div>
-                <ClassNameHeading fullName={data.fullName} />
+                <NameHeading fullName={data.fullName} headingType="Class" />
                 <ImplementsSummary typeDef={data.classDef.implements} />
                 <StabilitySummary jsDoc={data.jsDoc} />
               </div>
             </div>
             <div>
-              <Description jsDoc={data.jsDoc} />
+              <JsDocDescription jsDoc={data.jsDoc} />
               <Constructors data={data} />
               <Properties properties={data.classDef.properties} />
               <Methods methods={instanceMethods} />
@@ -89,71 +89,6 @@ export function Class({ data, context }: Props) {
   );
 }
 
-function ClassNameHeading({ fullName }: { fullName: string }) {
-  return (
-    <div className={"text-2xl leading-none break-all"}>
-      <span class="text-Class">class</span>
-      <span class="font-bold">
-        {nbsp}
-        {fullName}
-      </span>
-    </div>
-  );
-}
-
-function StabilitySummary({ jsDoc }: { jsDoc: JsDoc | undefined }) {
-  const isUnstable = jsDoc?.tags?.some((tag) =>
-    tag.kind === "experimental" as string
-  );
-
-  if (!isUnstable) {
-    return null;
-  }
-
-  return (
-    <div class="space-x-2 !mt-2">
-      <div class="text-unstable border border-unstable/50 bg-unstable/5 inline-flex items-center gap-0.5 *:flex-none rounded-md leading-none font-bold py-2 px-3">
-        Unstable
-      </div>
-    </div>
-  );
-}
-
-function ImplementsSummary({ typeDef }: { typeDef: TsTypeDef[] }) {
-  if (typeDef.length === 0) {
-    return null;
-  }
-
-  const spans = typeDef.map((iface) => {
-    return <TypeSummary typeDef={iface} />;
-  });
-
-  if (spans.length === 0) {
-    return null;
-  }
-
-  return (
-    <div class="symbolSubtitle">
-      <div>
-        <span class="type">implements{nbsp}</span>
-        {spans}
-      </div>
-    </div>
-  );
-}
-
-function Description({ jsDoc }: { jsDoc: JsDoc | undefined }) {
-  if (!jsDoc?.doc) {
-    return null;
-  }
-
-  return (
-    <DetailedSection>
-      <MarkdownContent text={jsDoc?.doc || ""} />
-    </DetailedSection>
-  );
-}
-
 function Methods(
   { methods, label = "Methods" }: { methods: ClassMethodDef[]; label?: string },
 ) {
@@ -161,23 +96,25 @@ function Methods(
     return <></>;
   }
 
-  const items = methods.map((method) => {
-    return (
-      <div>
-        <div>
-          <MethodSignature method={method} />
-        </div>
-        <DetailedSection>
-          <MarkdownContent text={method.jsDoc?.doc || ""} />
-        </DetailedSection>
-      </div>
-    );
-  });
-
   return (
     <MemberSection title={label}>
-      {items}
+      {methods.map((method) => {
+        return <MethodSummary method={method} />;
+      })}
     </MemberSection>
+  );
+}
+
+function MethodSummary({ method }: { method: ClassMethodDef }) {
+  return (
+    <div>
+      <div>
+        <MethodSignature method={method} />
+      </div>
+      <DetailedSection>
+        <MarkdownContent text={method.jsDoc?.doc || ""} />
+      </DetailedSection>
+    </div>
   );
 }
 
@@ -217,21 +154,6 @@ function Constructors({ data }: { data: DocNodeClass }) {
         {JSON.stringify(data.classDef.constructors, null, 2)}
       </pre>
     </MemberSection>
-  );
-}
-
-function DetailedSection({ children }: { children: React.ReactNode }) {
-  return (
-    <div class="max-w-[75ch]">
-      <div
-        data-color-mode="auto"
-        data-light-theme="light"
-        data-dark-theme="dark"
-        class="markdown-body"
-      >
-        {children}
-      </div>
-    </div>
   );
 }
 
