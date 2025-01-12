@@ -24,3 +24,28 @@ export function TocListItem(
     </li>
   );
 }
+
+export function TocSection(
+  { title, children }: { title: string; children: React.ReactNode },
+) {
+  if (children === undefined) {
+    return null;
+  }
+
+  if (Array.isArray(children) && children.length === 0) {
+    return null;
+  }
+
+  return (
+    <>
+      <li>
+        <a href={"#" + title.toLocaleLowerCase()} title={title}>{title}</a>
+      </li>
+      <li>
+        <ul>
+          {children}
+        </ul>
+      </li>
+    </>
+  );
+}

@@ -11,7 +11,11 @@ import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 import { MarkdownContent } from "./primatives/MarkdownContent.tsx";
 import { nbsp } from "../_util/common.ts";
-import { TableOfContents, TocListItem } from "./primatives/TableOfContents.tsx";
+import {
+  TableOfContents,
+  TocListItem,
+  TocSection,
+} from "./primatives/TableOfContents.tsx";
 import { PropertyName } from "./primatives/PropertyName.tsx";
 import { MethodSignature } from "./primatives/MethodSignature.tsx";
 import { TypeSummary } from "./primatives/TypeSummary.tsx";
@@ -68,26 +72,16 @@ export function Class({ data, context }: Props) {
         </main>
         <TableOfContents>
           <ul>
-            <li>
-              <a href="#properties" title="Properties">Properties</a>
-            </li>
-            <li>
-              <ul>
-                {data.classDef.properties.map((prop) => {
-                  return <TocListItem item={prop} type="property" />;
-                })}
-              </ul>
-            </li>
-            <li>
-              <a href="#methods" title="Methods">Methods</a>
-            </li>
-            <li>
-              <ul>
-                {instanceMethods.map((method) => {
-                  return <TocListItem item={method} type="method" />;
-                })}
-              </ul>
-            </li>
+            <TocSection title="Properties">
+              {data.classDef.properties.map((prop) => {
+                return <TocListItem item={prop} type="property" />;
+              })}
+            </TocSection>
+            <TocSection title="Methods">
+              {instanceMethods.map((method) => {
+                return <TocListItem item={method} type="method" />;
+              })}
+            </TocSection>
           </ul>
         </TableOfContents>
       </div>
