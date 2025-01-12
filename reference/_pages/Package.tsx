@@ -1,35 +1,25 @@
-import { JsDocTag, JsDocTagDoc } from "@deno/doc/types";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { ReferenceContext } from "../types.ts";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
-import { insertLinkCodes } from "./primatives/LinkCode.tsx";
+import { linkCodeAndParagraph } from "./primatives/LinkCode.tsx";
 
 type Props = {
-  data: Record<string, string | undefined>;
+  data: Map<string, string>;
   context: ReferenceContext;
 };
 
 export function Package({ data, context }: Props) {
-  const allCategoriesFromJsDocTags = context.symbols.map((item) =>
-    item.jsDoc?.tags?.filter((tag) => tag.kind === "category")
-  ).flat() as JsDocTagDoc[];
-
-  const categoryListItems = allCategoriesFromJsDocTags.map((tag) => {
-    if (!tag.doc) {
-      return null;
-    }
-
-    const key = tag.doc;
-    const value = data[key];
-
-    return (
-      <CategoryListSection
-        title={key}
-        href={`${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`}
-        summary={value || ""}
-      />
-    );
-  });
+  const categoryElements = data.entries().map(
+    ([key, value]) => {
+      return (
+        <CategoryListSection
+          title={key}
+          href={`${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`}
+          summary={value || ""}
+        />
+      );
+    },
+  ).toArray();
 
   return (
     <ReferencePage
@@ -46,7 +36,7 @@ export function Package({ data, context }: Props) {
           </div>
         </section>
         <div className={"space-y-7"}>
-          {categoryListItems}
+          {categoryElements}
         </div>
       </main>
     </ReferencePage>
@@ -57,16 +47,7 @@ function CategoryListSection(
   { title, href, summary }: { title: string; href: string; summary: string },
 ) {
   const anchorId = title.replace(" ", "-").toLocaleLowerCase();
-
-  const parts = summary.split("\n\n");
-  const examplePart = parts[parts.length - 1];
-  const partsExceptLast = parts.slice(0, parts.length - 1);
-  const summaryBody = partsExceptLast.join("\n\n");
-
-  const exampleBody = insertLinkCodes(examplePart);
-  const summaryBodyParas = summaryBody.split("\n\n").map((paragraph) => (
-    <p>{paragraph}</p>
-  ));
+  const processedDescription = linkCodeAndParagraph(summary);
 
   return (
     <section id={anchorId} className={"section"}>
@@ -79,10 +60,7 @@ function CategoryListSection(
         data-dark-theme="dark"
         class="markdown-body"
       >
-        {summaryBodyParas}
-        <p>
-          {exampleBody}
-        </p>
+        {processedDescription}
       </div>
     </section>
   );

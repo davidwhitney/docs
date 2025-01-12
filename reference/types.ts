@@ -39,7 +39,7 @@ export type ReferenceContext = {
     root: string;
     packageName: string;
     symbols: DocNode[];
-    currentCategoryList: Record<string, string | undefined>;
+    currentCategoryList: Map<string, string>;
 }
 
 export type ReferenceDocumentFactoryFunction<T extends DocNodeBase = DocNodeBase> = (item: T, context: ReferenceContext) => IterableIterator<LumeDocument>;

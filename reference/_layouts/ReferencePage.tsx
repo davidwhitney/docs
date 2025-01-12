@@ -31,7 +31,7 @@ export default function Layout(
 function CategoryPanel({ context }: { context: ReferenceContext }) {
   const categories = context.currentCategoryList;
 
-  const categoryListItems = Object.entries(categories).map(([key, value]) => {
+  const categoryListItems = categories.entries().map(([key, value]) => {
     const categoryLinkUrl =
       `${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`;
 
@@ -40,7 +40,7 @@ function CategoryPanel({ context }: { context: ReferenceContext }) {
         <a href={categoryLinkUrl}>{key}</a>
       </li>
     );
-  });
+  }).toArray();
 
   return (
     <div id={"categoryPanel"}>
