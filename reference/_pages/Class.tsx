@@ -3,17 +3,18 @@ import {
   ClassMethodDef,
   ClassPropertyDef,
   DocNodeClass,
+  JsDoc,
   TsTypeDef,
 } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
-import {
-  methodSignature,
-  typeInformation,
-} from "../_util/methodSignatureRendering.ts";
+import { methodSignature } from "../_util/methodSignatureRendering.ts";
 import { MarkdownContent } from "./primatives/MarkdownContent.tsx";
 import { nbsp } from "../_util/common.ts";
+import { TableOfContents, TocListItem } from "./primatives/TableOfContents.tsx";
+import { PropertyName } from "./primatives/PropertyName.tsx";
+import { MethodSignature } from "./primatives/MethodSignature.tsx";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -50,39 +51,63 @@ export function Class({ data, context }: Props) {
           <article>
             <div>
               <div>
-                <ClassNameHeading data={data} />
-                <ImplementsSummary _implements={data.classDef.implements} />
-                <StabilitySummary data={data} />
+                <ClassNameHeading fullName={data.fullName} />
+                <ImplementsSummary typeDef={data.classDef.implements} />
+                <StabilitySummary jsDoc={data.jsDoc} />
               </div>
             </div>
             <div>
-              <Description data={data} />
+              <Description jsDoc={data.jsDoc} />
               <Constructors data={data} />
-              <Properties data={data} />
+              <Properties properties={data.classDef.properties} />
               <Methods methods={instanceMethods} />
               <Methods methods={staticMethods} label={"Static Methods"} />
             </div>
           </article>
         </main>
+        <TableOfContents>
+          <ul>
+            <li>
+              <a href="#properties" title="Properties">Properties</a>
+            </li>
+            <li>
+              <ul>
+                {data.classDef.properties.map((prop) => {
+                  return <TocListItem item={prop} type="property" />;
+                })}
+              </ul>
+            </li>
+            <li>
+              <a href="#methods" title="Methods">Methods</a>
+            </li>
+            <li>
+              <ul>
+                {instanceMethods.map((method) => {
+                  return <TocListItem item={method} type="method" />;
+                })}
+              </ul>
+            </li>
+          </ul>
+        </TableOfContents>
       </div>
     </ReferencePage>
   );
 }
 
-function ClassNameHeading({ data }: { data: DocNodeClass & HasFullName }) {
+function ClassNameHeading({ fullName }: { fullName: string }) {
   return (
     <div className={"text-2xl leading-none break-all"}>
       <span class="text-Class">class</span>
       <span class="font-bold">
         {nbsp}
-        {data.fullName}
+        {fullName}
       </span>
     </div>
   );
 }
 
-function StabilitySummary({ data }: { data: DocNodeClass }) {
-  const isUnstable = data.jsDoc?.tags?.some((tag) =>
+function StabilitySummary({ jsDoc }: { jsDoc: JsDoc | undefined }) {
+  const isUnstable = jsDoc?.tags?.some((tag) =>
     tag.kind === "experimental" as string
   );
 
@@ -99,12 +124,12 @@ function StabilitySummary({ data }: { data: DocNodeClass }) {
   );
 }
 
-function ImplementsSummary({ _implements }: { _implements: TsTypeDef[] }) {
-  if (_implements.length === 0) {
+function ImplementsSummary({ typeDef }: { typeDef: TsTypeDef[] }) {
+  if (typeDef.length === 0) {
     return null;
   }
 
-  const spans = _implements.map((iface) => {
+  const spans = typeDef.map((iface) => {
     return <span>{iface.repr}</span>;
   });
 
@@ -118,14 +143,14 @@ function ImplementsSummary({ _implements }: { _implements: TsTypeDef[] }) {
   );
 }
 
-function Description({ data }: { data: DocNodeClass }) {
-  if (!data.jsDoc?.doc) {
+function Description({ jsDoc }: { jsDoc: JsDoc | undefined }) {
+  if (!jsDoc?.doc) {
     return null;
   }
 
   return (
     <DetailedSection>
-      <MarkdownContent text={data.jsDoc?.doc || ""} />
+      <MarkdownContent text={jsDoc?.doc || ""} />
     </DetailedSection>
   );
 }
@@ -157,47 +182,14 @@ function Methods(
   );
 }
 
-function MethodSignature({ method }: { method: ClassMethodDef }) {
-  const asParts = methodSignature(method);
-
-  const partElements = [];
-  for (const part of asParts) {
-    if (
-      part.kind === "method-brace" && part.value.trim() === ")" &&
-      method.functionDef.params.length > 1
-    ) {
-      partElements.push(<br />);
-    }
-
-    partElements.push(<span className={part.kind}>{part.value}</span>);
-
-    if (
-      part.kind === "method-brace" && part.value.trim() === "(" &&
-      method.functionDef.params.length > 1
-    ) {
-      partElements.push(<br />);
-    }
-
-    if (part.kind === "param-separator") {
-      partElements.push(<br />);
-    }
-  }
-
-  return (
-    <>
-      {partElements}
-    </>
-  );
-}
-
-function Properties({ data }: { data: DocNodeClass }) {
-  if (data.classDef.properties.length === 0) {
+function Properties({ properties }: { properties: ClassPropertyDef[] }) {
+  if (properties.length === 0) {
     return <></>;
   }
 
   return (
     <MemberSection title="Properties">
-      {data.classDef.properties.map((prop) => <PropertyItem property={prop} />)}
+      {properties.map((prop) => <PropertyItem property={prop} />)}
     </MemberSection>
   );
 }
@@ -212,24 +204,6 @@ function PropertyItem({ property }: { property: ClassPropertyDef }) {
         <MarkdownContent text={property.jsDoc?.doc} />
       </DetailedSection>
     </div>
-  );
-}
-
-function PropertyName({ property }: { property: ClassPropertyDef }) {
-  const typeInfoElements = typeInformation(property.tsType).map((part) => {
-    const classes = [part.kind, "font-medium", "text-stone-500"].join(" ");
-    return <span className={classes}>{part.value}</span>;
-  });
-
-  const propertyNameClass = "identifier font-bold font-lg link";
-  const propertyTypeClass = "type font-medium text-stone-500";
-
-  return (
-    <>
-      <span className={propertyNameClass}>{property.name}</span>
-      <span className={propertyTypeClass}>:{nbsp}</span>
-      {typeInfoElements}
-    </>
   );
 }
 
