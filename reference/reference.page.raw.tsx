@@ -36,7 +36,9 @@ export default async function* () {
       throw new Error();
     }
 
-    for await (const { packageName, symbols } of getSymbols()) {
+    const allSymbols = await getAllSymbols();
+
+    for (const [packageName, symbols] of allSymbols.entries()) {
       const cleanedSymbols = populateItemNamespaces(symbols) as DocNode[];
 
       const currentCategoryList = sections.filter((x) =>
@@ -75,4 +77,52 @@ export default async function* () {
   }
 
   console.log("Generated", generated.length, "reference pages");
+}
+
+async function getAllSymbols() {
+  const allSymbols = new Map<string, DocNode[]>();
+  for await (const { packageName, symbols } of getSymbols()) {
+    // Group symbols by name
+    const symbolsByName = new Map<string, DocNode[]>();
+
+    for (const symbol of symbols) {
+      const existing = symbolsByName.get(symbol.name) || [];
+      symbolsByName.set(symbol.name, [...existing, symbol]);
+    }
+
+    // Merge symbols with same name
+    const mergedSymbols = Array.from(symbolsByName.values()).map((items) => {
+      if (items.length === 1) {
+        return items[0];
+      }
+
+      // Sort by priority (class > interface > other)
+      const sorted = items.sort((a, b) => {
+        if (a.kind === "class") return -1;
+        if (b.kind === "class") return 1;
+        if (a.kind === "interface") return -1;
+        if (b.kind === "interface") return 1;
+        return 0;
+      });
+
+      // Merge docs if available
+      const primary = sorted[0];
+      const jsDoc = sorted
+        .map((s) => s.jsDoc?.doc)
+        .filter(Boolean)
+        .join("\n\n");
+
+      if (jsDoc) {
+        primary.jsDoc = { ...primary.jsDoc, doc: jsDoc };
+      }
+
+      return primary;
+    });
+
+    allSymbols.set(packageName, mergedSymbols);
+  }
+
+  // TODO: merge symbols that share names here
+
+  return allSymbols;
 }

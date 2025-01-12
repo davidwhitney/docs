@@ -9,12 +9,13 @@ import {
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
-import { methodSignature } from "../_util/methodSignatureRendering.ts";
 import { MarkdownContent } from "./primatives/MarkdownContent.tsx";
 import { nbsp } from "../_util/common.ts";
 import { TableOfContents, TocListItem } from "./primatives/TableOfContents.tsx";
 import { PropertyName } from "./primatives/PropertyName.tsx";
 import { MethodSignature } from "./primatives/MethodSignature.tsx";
+import { TypeSummary } from "./primatives/TypeSummary.tsx";
+import { typeInformation } from "../_util/methodSignatureRendering.ts";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -130,8 +131,12 @@ function ImplementsSummary({ typeDef }: { typeDef: TsTypeDef[] }) {
   }
 
   const spans = typeDef.map((iface) => {
-    return <span>{iface.repr}</span>;
+    return <TypeSummary typeDef={iface} />;
   });
+
+  if (spans.length === 0) {
+    return null;
+  }
 
   return (
     <div class="symbolSubtitle">
