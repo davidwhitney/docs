@@ -5,23 +5,19 @@ export function parseCategories(symbols: DocNode[], categoryDescriptionMap: Reco
         item.jsDoc?.tags?.filter((tag) => tag.kind === "category")
     ).flat() as JsDocTagDoc[];
 
-    const uniqueCategories = Array.from(
-        new Set(allCategoriesFromJsDocTags.map((tag) => tag.doc)),
-    ).sort();
+    const distinctCategories = [...new Set(allCategoriesFromJsDocTags.map((tag) => tag?.doc))];
 
-    const categoriesWithDescriptions = new Map<string, string>();
-    uniqueCategories.forEach((category) => {
-        if (!category) {
-            return;
-        }
-
-        const description = categoryDescriptionMap[category] || "";
-        categoriesWithDescriptions.set(category, description);
-    });
-
-    return categoriesWithDescriptions;
+    return distinctCategories
+        .filter(x => x !== undefined)
+        .sort()
+        .reduce((acc, category) => {
+            const description = categoryDescriptionMap[category] || "";
+            acc.set(category, description);
+            return acc;
+        }, new Map<string, string>());
 }
 
+// deno-lint-ignore no-explicit-any
 export function categoryDataFrom(sections: { path: string, categoryDocs: any }[], packageName: string): Record<string, string | undefined> {
     const categoryDescriptions = sections.filter((x) =>
         x.path === packageName.toLocaleLowerCase()
