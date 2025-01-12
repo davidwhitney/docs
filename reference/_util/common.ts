@@ -37,3 +37,6 @@ export function populateItemNamespaces(items: DocNode[], populateNamespace = tru
 
     return flattened;
 }
+
+
+export const nbsp = "\u00A0";

@@ -13,6 +13,7 @@ import {
   typeInformation,
 } from "../_util/methodSignatureRendering.ts";
 import { MarkdownContent } from "./primatives/MarkdownContent.tsx";
+import { nbsp } from "../_util/common.ts";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -73,7 +74,7 @@ function ClassNameHeading({ data }: { data: DocNodeClass & HasFullName }) {
     <div className={"text-2xl leading-none break-all"}>
       <span class="text-Class">class</span>
       <span class="font-bold">
-        &nbsp;
+        {nbsp}
         {data.fullName}
       </span>
     </div>
@@ -110,7 +111,7 @@ function ImplementsSummary({ _implements }: { _implements: TsTypeDef[] }) {
   return (
     <div class="symbolSubtitle">
       <div>
-        <span class="type">implements</span>
+        <span class="type">implements{nbsp}</span>
         {spans}
       </div>
     </div>
@@ -216,13 +217,17 @@ function PropertyItem({ property }: { property: ClassPropertyDef }) {
 
 function PropertyName({ property }: { property: ClassPropertyDef }) {
   const typeInfoElements = typeInformation(property.tsType).map((part) => {
-    return <span className={part.kind}>{part.value}</span>;
+    const classes = [part.kind, "font-medium", "text-stone-500"].join(" ");
+    return <span className={classes}>{part.value}</span>;
   });
+
+  const propertyNameClass = "identifier font-bold font-lg link";
+  const propertyTypeClass = "type font-medium text-stone-500";
 
   return (
     <>
-      <span className={"identifier"}>{property.name}</span>
-      <span className={"type"}>:</span>
+      <span className={propertyNameClass}>{property.name}</span>
+      <span className={propertyTypeClass}>:{nbsp}</span>
       {typeInfoElements}
     </>
   );

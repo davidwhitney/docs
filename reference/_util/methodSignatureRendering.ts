@@ -123,7 +123,7 @@ export function typeInformation(type: TsTypeDef | undefined): CodePart[] {
     }
 
     if (type.kind === "array") {
-        parts.push({ value: type?.array?.repr || "" + "[]", kind: "identifier" });
+        parts.push({ value: type?.array?.repr || "" + "[]", kind: "type" });
         parts.push({ value: "[]", kind: "type" });
     }
 

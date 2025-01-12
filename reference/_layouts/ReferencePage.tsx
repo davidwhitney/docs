@@ -13,6 +13,7 @@ export default function Layout(
       {/* sorry mum, put these somewhere good */}
       <link rel="stylesheet" href="/reference-styles/styles.css" />
       <link rel="stylesheet" href="/reference-styles/page.css" />
+      <link rel="stylesheet" href="/reference-styles/extra-styles.css" />
 
       <div className={"ddoc"}>
         <CategoryPanel context={context} />
