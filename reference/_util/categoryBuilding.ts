@@ -5,7 +5,7 @@ export function parseCategories(symbols: DocNode[], categoryDescriptionMap: Reco
         item.jsDoc?.tags?.filter((tag) => tag.kind === "category")
     ).flat() as JsDocTagDoc[];
 
-    const distinctCategories = [...new Set(allCategoriesFromJsDocTags.map((tag) => tag?.doc))];
+    const distinctCategories = [...new Set(allCategoriesFromJsDocTags.map((tag) => tag?.doc?.trim()))];
 
     return distinctCategories
         .filter(x => x !== undefined)

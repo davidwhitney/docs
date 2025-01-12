@@ -25,7 +25,7 @@ export function insertLinkCodes(text: string) {
     const symbol = match[1].trim();
     const target = "~/" + symbol;
 
-    return `<a href="${target}">${symbol}</a>`;
+    return `<a href="${target}"><code>${symbol}</code></a>`;
   });
 
   return partsAfterSub.join("");

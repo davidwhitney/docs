@@ -7,10 +7,10 @@ import {
   MightHaveNamespace,
   ReferenceContext,
 } from "../types.ts";
-import { insertLinkCodes } from "./primatives/LinkCode.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 import { CodeIcon } from "./primatives/CodeIcon.tsx";
 import { Package } from "./Package.tsx";
+import { MarkdownContent } from "./primatives/MarkdownContent.tsx";
 
 export default function* getPages(
   context: ReferenceContext,
@@ -21,7 +21,10 @@ export default function* getPages(
     content: <Package data={context.currentCategoryList} context={context} />,
   };
 
-  for (const [key] of Object.entries(context.currentCategoryList)) {
+  for (const [key] of context.currentCategoryList) {
+    const url =
+      `${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`;
+    console.log("generating category page for", key, url);
     yield {
       title: key,
       url:
@@ -99,8 +102,7 @@ function CategoryPageItem(
   { item }: { item: DocNodeBase & MightHaveNamespace },
 ) {
   const displayName = item.fullName || item.name;
-  const firstLineOfJsDoc = item.jsDoc?.doc?.split("\n")[0] || "";
-  const descriptionWithLinkCode = insertLinkCodes(firstLineOfJsDoc);
+  const firstLine = item.jsDoc?.doc?.split("\n\n")[0];
 
   return (
     <div className={"namespaceItem"}>
@@ -109,9 +111,7 @@ function CategoryPageItem(
         <a href={`~/${displayName}`}>
           {displayName}
         </a>
-        <p>
-          {descriptionWithLinkCode}
-        </p>
+        <MarkdownContent text={firstLine} />
         <MethodLinks item={item} />
       </div>
     </div>
