@@ -1,6 +1,12 @@
 import { DocNodeVariable } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
+import { MarkdownContent } from "./primitives/MarkdownContent.tsx";
+import { TableOfContents, TocListItem, TocSection } from "./partials/TableOfContents.tsx";
+import { NameHeading } from "./partials/NameHeading.tsx";
+import { StabilitySummary } from "./partials/Badges.tsx";
+import { JsDocDescription } from "./partials/JsDocDescription.tsx";
+import { DetailedSection } from "./partials/DetailedSection.tsx";
 
 type Props = { data: DocNodeVariable & HasFullName; context: ReferenceContext };
 
@@ -22,13 +28,35 @@ export function Variable({ data, context }: Props) {
       context={context}
       navigation={{ category: context.packageName, currentItemName: data.name }}
     >
-      I am a variable, my name is {data.name}
-
-      {data.jsDoc?.doc && <p>{data.jsDoc?.doc}</p>}
-
-      <pre>
-        {JSON.stringify(data, null, 2)}
-      </pre>
+      <main class={"symbolGroup"}>
+        <article>
+          <div>
+            <div>
+              <NameHeading fullName={data.fullName} headingType="Variable" />
+              <StabilitySummary jsDoc={data.jsDoc} />
+            </div>
+          </div>
+          <div>
+            <JsDocDescription jsDoc={data.jsDoc} />
+            <VariableType type={data.variableDef.tsType} />
+          </div>
+        </article>
+      </main>
+      <TableOfContents>
+        <ul>
+          <TocSection title="Variable">
+            <TocListItem item={data} type="variable" />
+          </TocSection>
+        </ul>
+      </TableOfContents>
     </ReferencePage>
+  );
+}
+
+function VariableType({ type }: { type: any }) {
+  return (
+    <DetailedSection>
+      <MarkdownContent text={`Type: ${type.repr}`} />
+    </DetailedSection>
   );
 }
