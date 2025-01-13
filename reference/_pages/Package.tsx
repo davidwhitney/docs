@@ -12,9 +12,9 @@ export function Package({ data, context }: Props) {
   const categoryElements = data.entries().map(
     ([key, value]) => {
       return (
-        <CategoryListSection
-          title={key}
-          href={`${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`}
+        <CategorySummary
+          identifier={key}
+          context={context}
           summary={value || ""}
         />
       );
@@ -43,16 +43,22 @@ export function Package({ data, context }: Props) {
   );
 }
 
-function CategoryListSection(
-  { title, href, summary }: { title: string; href: string; summary: string },
+export function CategorySummary(
+  { identifier, context, summary }: {
+    identifier: string;
+    context: ReferenceContext;
+    summary: string;
+  },
 ) {
-  const anchorId = title.replace(" ", "-").toLocaleLowerCase();
+  const href =
+    `${context.root}/${context.packageName.toLocaleLowerCase()}/${identifier.toLocaleLowerCase()}`;
+  const anchorId = identifier.replace(" ", "-").toLocaleLowerCase();
   const processedDescription = linkCodeAndParagraph(summary);
 
   return (
     <section id={anchorId} className={"section"}>
       <AnchorableHeading anchor={anchorId}>
-        <a href={href}>{title}</a>
+        <a href={href}>{identifier}</a>
       </AnchorableHeading>
       <div
         data-color-mode="auto"

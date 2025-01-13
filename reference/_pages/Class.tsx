@@ -51,7 +51,6 @@ export function Class({ data, context }: Props) {
         currentItemName: data.fullName,
       }}
     >
-      <div id={"content"}>
         <main class={"symbolGroup"}>
           <article>
             <div>
@@ -84,7 +83,6 @@ export function Class({ data, context }: Props) {
             </TocSection>
           </ul>
         </TableOfContents>
-      </div>
     </ReferencePage>
   );
 }

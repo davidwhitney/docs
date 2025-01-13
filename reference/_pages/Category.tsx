@@ -1,16 +1,10 @@
 import { DocNodeBase, DocNodeClass } from "@deno/doc/types";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { flattenItems } from "../_util/common.ts";
-import {
-  HasNamespace,
-  LumeDocument,
-  MightHaveNamespace,
-  ReferenceContext,
-} from "../types.ts";
+import { LumeDocument, ReferenceContext } from "../types.ts";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
-import { CodeIcon } from "./primatives/CodeIcon.tsx";
 import { Package } from "./Package.tsx";
-import { MarkdownContent } from "./primatives/MarkdownContent.tsx";
+import { SymbolSummaryItem } from "./primatives/SymbolSummaryItem.tsx";
 
 export default function* getPages(
   context: ReferenceContext,
@@ -22,9 +16,6 @@ export default function* getPages(
   };
 
   for (const [key] of context.currentCategoryList) {
-    const url =
-      `${context.root}/${context.packageName.toLocaleLowerCase()}/${key.toLocaleLowerCase()}`;
-    console.log("generating category page for", key, url);
     yield {
       title: key,
       url:
@@ -92,65 +83,8 @@ function CategoryPageSection(
     <section id={anchorId} className={"section"}>
       <AnchorableHeading anchor={anchorId}>{title}</AnchorableHeading>
       <div className={"namespaceSection"}>
-        {items.map((item) => <CategoryPageItem item={item} />)}
+        {items.map((item) => <SymbolSummaryItem item={item} />)}
       </div>
     </section>
-  );
-}
-
-function CategoryPageItem(
-  { item }: { item: DocNodeBase & MightHaveNamespace },
-) {
-  const displayName = item.fullName || item.name;
-  const firstLine = item.jsDoc?.doc?.split("\n\n")[0];
-
-  return (
-    <div className={"namespaceItem"}>
-      <CodeIcon glyph={item.kind} />
-      <div className={"namespaceItemContent"}>
-        <a href={`~/${displayName}`}>
-          {displayName}
-        </a>
-        <MarkdownContent text={firstLine} />
-        <MethodLinks item={item} />
-      </div>
-    </div>
-  );
-}
-
-function MethodLinks({ item }: { item: DocNodeBase }) {
-  if (item.kind !== "class") {
-    return <></>;
-  }
-
-  const asClass = item as DocNodeClass & HasNamespace;
-  const methods = asClass.classDef.methods.sort((a, b) =>
-    a.name.localeCompare(b.name)
-  );
-
-  const filteredMethodsList = [
-    "[Symbol.dispose]",
-    "[Symbol.asyncDispose]",
-    "[Symbol.asyncIterator]",
-  ];
-
-  const filteredMethods = methods.filter((method) =>
-    !filteredMethodsList.includes(method.name)
-  );
-
-  const methodLinks = filteredMethods.map((method) => {
-    return (
-      <li>
-        <a href={`~/${asClass.fullName}#${method.name}`}>
-          {method.name}
-        </a>
-      </li>
-    );
-  });
-
-  return (
-    <ul className={"namespaceItemContentSubItems"}>
-      {methodLinks}
-    </ul>
   );
 }

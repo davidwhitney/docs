@@ -63,7 +63,7 @@ export default async function* () {
 
         for await (const page of pages) {
           if (generated.includes(page.url)) {
-            console.warn(`⚠️ Skipping duplicate page: ${page.url}!`);
+            //console.warn(`⚠️ Skipping duplicate page: ${page.url}!`);
             skipped++;
             continue;
           }

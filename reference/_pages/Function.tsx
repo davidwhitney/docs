@@ -31,7 +31,6 @@ export function Function({ data, context }: Props) {
         currentItemName: data.fullName,
       }}
     >
-      <div id={"content"}>
         <main class={"symbolGroup"}>
           <article>
             <div>
@@ -51,7 +50,6 @@ export function Function({ data, context }: Props) {
             </div>
           </article>
         </main>
-      </div>
     </ReferencePage>
   );
 

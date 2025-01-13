@@ -19,9 +19,7 @@ export function parseCategories(symbols: DocNode[], categoryDescriptionMap: Reco
 
 // deno-lint-ignore no-explicit-any
 export function categoryDataFrom(sections: { path: string, categoryDocs: any }[], packageName: string): Record<string, string | undefined> {
-    const categoryDescriptions = sections.filter((x) =>
+    return sections.filter((x) =>
         x.path === packageName.toLocaleLowerCase()
     )[0]!.categoryDocs as Record<string, string | undefined>;
-
-    return categoryDescriptions;
 }
