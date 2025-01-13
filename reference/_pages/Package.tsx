@@ -1,7 +1,7 @@
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { ReferenceContext } from "../types.ts";
-import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
-import { linkCodeAndParagraph } from "./primatives/LinkCode.tsx";
+import { AnchorableHeading } from "./partials/AnchorableHeading.tsx";
+import { linkCodeAndParagraph } from "./primitives/LinkCode.tsx";
 
 type Props = {
   data: Map<string, string>;

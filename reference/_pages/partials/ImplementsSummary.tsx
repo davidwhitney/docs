@@ -1,5 +1,5 @@
 import { TsTypeDef } from "@deno/doc/types";
-import { TypeSummary } from "./TypeSummary.tsx";
+import { TypeSummary } from "../primitives/TypeSummary.tsx";
 import { nbsp } from "../../_util/common.ts";
 
 export function ImplementsSummary({ typeDef }: { typeDef: TsTypeDef[] }) {

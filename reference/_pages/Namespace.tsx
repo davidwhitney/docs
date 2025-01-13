@@ -1,18 +1,17 @@
-import React from "npm:@preact/compat";
 import { DocNodeNamespace } from "@deno/doc/types";
 import { LumeDocument, ReferenceContext } from "../types.ts";
 import generatePageFor from "../pageFactory.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
-import { NameHeading } from "./primatives/NameHeading.tsx";
-import { JsDocDescription } from "./primatives/JsDocDescription.tsx";
+import { NameHeading } from "./partials/NameHeading.tsx";
+import { JsDocDescription } from "./partials/JsDocDescription.tsx";
 import {
   TableOfContents,
   TocListItem,
   TocSection,
-} from "./primatives/TableOfContents.tsx";
-import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
-import { SymbolSummaryItem } from "./primatives/SymbolSummaryItem.tsx";
+} from "./partials/TableOfContents.tsx";
+import { SymbolSummaryItem } from "./partials/SymbolSummaryItem.tsx";
 import { sections } from "../_util/common.ts";
+import { MemberSection } from "./partials/MemberSection.tsx";
 
 type Props = { data: DocNodeNamespace; context: ReferenceContext };
 
@@ -78,38 +77,14 @@ export function Namespace({ data, context }: Props) {
           {sections.map(([title, kind]) => {
             return (
               <TocSection title={title}>
-                  {children.filter((x) => x.kind === kind).map((x) => {
-                    return <TocListItem item={x} type={kind} />;
-                  })}
+                {children.filter((x) => x.kind === kind).map((x) => {
+                  return <TocListItem item={x} type={kind} />;
+                })}
               </TocSection>
             );
           })}
         </ul>
       </TableOfContents>
     </ReferencePage>
-  );
-}
-
-function MemberSection(
-  { title, children }: { title: string; children: React.ReactNode },
-) {
-  if (!children) {
-    return null;
-  }
-
-  return (
-    <div>
-      <div className={"space-y-7"}>
-        <section className={"section"}>
-          <AnchorableHeading anchor={title}>
-            {title}
-          </AnchorableHeading>
-        </section>
-      </div>
-
-      <div className={"space-y-7"}>
-        {children}
-      </div>
-    </div>
   );
 }

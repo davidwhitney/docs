@@ -6,20 +6,21 @@ import {
 } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
-import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
-import { MarkdownContent } from "./primatives/MarkdownContent.tsx";
+import { AnchorableHeading } from "./partials/AnchorableHeading.tsx";
+import { MarkdownContent } from "./primitives/MarkdownContent.tsx";
 import {
   TableOfContents,
   TocListItem,
   TocSection,
-} from "./primatives/TableOfContents.tsx";
-import { PropertyName } from "./primatives/PropertyName.tsx";
-import { MethodSignature } from "./primatives/MethodSignature.tsx";
-import { NameHeading } from "./primatives/NameHeading.tsx";
-import { StabilitySummary } from "./primatives/StabilitySummary.tsx";
-import { ImplementsSummary } from "./primatives/ImplementsSummary.tsx";
-import { JsDocDescription } from "./primatives/JsDocDescription.tsx";
-import { DetailedSection } from "./primatives/DetailedSection.tsx";
+} from "./partials/TableOfContents.tsx";
+import { PropertyName } from "./primitives/PropertyName.tsx";
+import { MethodSignature } from "./primitives/MethodSignature.tsx";
+import { NameHeading } from "./partials/NameHeading.tsx";
+import { StabilitySummary } from "./partials/StabilitySummary.tsx";
+import { ImplementsSummary } from "./partials/ImplementsSummary.tsx";
+import { JsDocDescription } from "./partials/JsDocDescription.tsx";
+import { DetailedSection } from "./partials/DetailedSection.tsx";
+import { MemberSection } from "./partials/MemberSection.tsx";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -152,25 +153,5 @@ function Constructors({ data }: { data: DocNodeClass }) {
         {JSON.stringify(data.classDef.constructors, null, 2)}
       </pre>
     </MemberSection>
-  );
-}
-
-function MemberSection(
-  { title, children }: { title: string; children: React.ReactNode },
-) {
-  return (
-    <div>
-      <div className={"space-y-7"}>
-        <section className={"section"}>
-          <AnchorableHeading anchor={title}>
-            {title}
-          </AnchorableHeading>
-        </section>
-      </div>
-
-      <div className={"space-y-7"}>
-        {children}
-      </div>
-    </div>
   );
 }

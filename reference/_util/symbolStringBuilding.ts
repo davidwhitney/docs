@@ -1,12 +1,17 @@
-import { ClassMethodDef, FunctionDef, LiteralPropertyDef, ParamDef, ParamIdentifierDef, ParamRestDef, TsTypeDef } from "@deno/doc/types";
+import { ClassMethodDef, FunctionDef, InterfaceMethodDef, LiteralPropertyDef, ParamDef, ParamIdentifierDef, ParamRestDef, TsTypeDef } from "@deno/doc/types";
 
 export type CodePart = {
     value: string;
     kind: string;
 }
 
+function isFunctionDefTypeGuard(method: FunctionDef | InterfaceMethodDef): method is FunctionDef {
+    return (method as FunctionDef).params !== undefined;
+}
+
 export function methodSignature(method: ClassMethodDef) {
     const parts: CodePart[] = [];
+
     if (method.accessibility) {
         parts.push({ value: method.accessibility, kind: "accessibility" });
     }
@@ -28,10 +33,20 @@ export function methodSignature(method: ClassMethodDef) {
     return parts;
 }
 
-export function functionSignature(functionDef: FunctionDef, nameOverride: string | undefined = undefined) {
+export function interfaceSignature(iface: InterfaceMethodDef) {
+    const parts: CodePart[] = [];
+    parts.push(...functionSignature(iface, iface.name));
+    return parts;
+}
+
+export function functionSignature(functionDef: FunctionDef | InterfaceMethodDef, nameOverride: string | undefined = undefined) {
     const parts: CodePart[] = [];
 
-    parts.push({ value: functionDef.defName || nameOverride || "", kind: "name" });
+    const nameValue = isFunctionDefTypeGuard(functionDef)
+        ? functionDef.defName || nameOverride || ""
+        : functionDef.name || nameOverride || "";
+
+    parts.push({ value: nameValue, kind: "name" });
 
     if (functionDef.params.length > 0) {
         parts.push({ value: "(", kind: "method-brace" });

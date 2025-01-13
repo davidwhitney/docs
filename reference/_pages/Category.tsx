@@ -6,14 +6,14 @@ import {
   MightHaveNamespace,
   ReferenceContext,
 } from "../types.ts";
-import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
+import { AnchorableHeading } from "./partials/AnchorableHeading.tsx";
 import { Package } from "./Package.tsx";
-import { SymbolSummaryItem } from "./primatives/SymbolSummaryItem.tsx";
+import { SymbolSummaryItem } from "./partials/SymbolSummaryItem.tsx";
 import {
   TableOfContents,
   TocListItem,
   TocSection,
-} from "./primatives/TableOfContents.tsx";
+} from "./partials/TableOfContents.tsx";
 
 export default function* getPages(
   context: ReferenceContext,

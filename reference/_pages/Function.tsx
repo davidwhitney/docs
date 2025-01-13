@@ -1,10 +1,10 @@
 import { DocNodeFunction } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
-import { NameHeading } from "./primatives/NameHeading.tsx";
-import { StabilitySummary } from "./primatives/StabilitySummary.tsx";
-import { JsDocDescription } from "./primatives/JsDocDescription.tsx";
-import { FunctionSignature } from "./primatives/FunctionSignature.tsx";
+import { NameHeading } from "./partials/NameHeading.tsx";
+import { StabilitySummary } from "./partials/StabilitySummary.tsx";
+import { JsDocDescription } from "./partials/JsDocDescription.tsx";
+import { FunctionSignature } from "./primitives/FunctionSignature.tsx";
 
 type Props = { data: DocNodeFunction & HasFullName; context: ReferenceContext };
 
