@@ -2,7 +2,7 @@ import { DocNodeFunction } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { NameHeading } from "./partials/NameHeading.tsx";
-import { StabilitySummary } from "./partials/StabilitySummary.tsx";
+import { StabilitySummary } from "./partials/Badges.tsx";
 import { JsDocDescription } from "./partials/JsDocDescription.tsx";
 import { FunctionSignature } from "./primitives/FunctionSignature.tsx";
 
@@ -31,40 +31,25 @@ export function Function({ data, context }: Props) {
         currentItemName: data.fullName,
       }}
     >
-        <main class={"symbolGroup"}>
-          <article>
+      <main class={"symbolGroup"}>
+        <article>
+          <div>
             <div>
-              <div>
-                <NameHeading fullName={data.fullName} headingType="Function" />
-                <StabilitySummary jsDoc={data.jsDoc} />
-              </div>
-            </div>{" "}
-            <div>
-              <FunctionSignature
-                functionDef={data.functionDef}
-                nameOverride={nameOnly}
-              />
+              <NameHeading fullName={data.fullName} headingType="Function" />
+              <StabilitySummary jsDoc={data.jsDoc} />
             </div>
-            <div>
-              <JsDocDescription jsDoc={data.jsDoc} />
-            </div>
-          </article>
-        </main>
+          </div>{" "}
+          <div>
+            <FunctionSignature
+              functionDef={data.functionDef}
+              nameOverride={nameOnly}
+            />
+          </div>
+          <div>
+            <JsDocDescription jsDoc={data.jsDoc} />
+          </div>
+        </article>
+      </main>
     </ReferencePage>
   );
-
-  // return (
-  //   <ReferencePage
-  //     context={context}
-  //     navigation={{ category: context.packageName, currentItemName: data.name }}
-  //   >
-  //     I am a function, my name is {data.name}
-
-  //     {data.jsDoc?.doc && <p>{data.jsDoc?.doc}</p>}
-
-  //     <pre>
-  //       {JSON.stringify(data, null, 2)}
-  //     </pre>
-  //   </ReferencePage>
-  // );
 }

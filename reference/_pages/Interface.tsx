@@ -13,15 +13,15 @@ import {
   TocListItem,
   TocSection,
 } from "./partials/TableOfContents.tsx";
-import { PropertyName } from "./primitives/PropertyName.tsx";
 import { NameHeading } from "./partials/NameHeading.tsx";
-import { StabilitySummary } from "./partials/StabilitySummary.tsx";
+import { StabilitySummary } from "./partials/Badges.tsx";
 import { JsDocDescription } from "./partials/JsDocDescription.tsx";
 import { DetailedSection } from "./partials/DetailedSection.tsx";
 import { InterfaceMethodSignature } from "./primitives/InterfaceMethodSignature.tsx";
 import { TypeSummary } from "./primitives/TypeSummary.tsx";
 import { nbsp } from "../_util/common.ts";
 import { MemberSection } from "./partials/MemberSection.tsx";
+import { PropertyItem } from "./partials/PropertyItem.tsx";
 
 type Props = {
   data: DocNodeInterface & HasFullName;
@@ -119,19 +119,6 @@ function Properties({ properties }: { properties: InterfacePropertyDef[] }) {
     <MemberSection title="Properties">
       {properties.map((prop) => <PropertyItem property={prop} />)}
     </MemberSection>
-  );
-}
-
-function PropertyItem({ property }: { property: InterfacePropertyDef }) {
-  return (
-    <div>
-      <h3>
-        <PropertyName property={property} />
-      </h3>
-      <DetailedSection>
-        <MarkdownContent text={property.jsDoc?.doc} />
-      </DetailedSection>
-    </div>
   );
 }
 

@@ -1,4 +1,3 @@
-import React from "npm:@preact/compat";
 import {
   ClassMethodDef,
   ClassPropertyDef,
@@ -6,21 +5,20 @@ import {
 } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
-import { AnchorableHeading } from "./partials/AnchorableHeading.tsx";
 import { MarkdownContent } from "./primitives/MarkdownContent.tsx";
 import {
   TableOfContents,
   TocListItem,
   TocSection,
 } from "./partials/TableOfContents.tsx";
-import { PropertyName } from "./primitives/PropertyName.tsx";
 import { MethodSignature } from "./primitives/MethodSignature.tsx";
 import { NameHeading } from "./partials/NameHeading.tsx";
-import { StabilitySummary } from "./partials/StabilitySummary.tsx";
+import { StabilitySummary } from "./partials/Badges.tsx";
 import { ImplementsSummary } from "./partials/ImplementsSummary.tsx";
 import { JsDocDescription } from "./partials/JsDocDescription.tsx";
 import { DetailedSection } from "./partials/DetailedSection.tsx";
 import { MemberSection } from "./partials/MemberSection.tsx";
+import { PropertyItem } from "./partials/PropertyItem.tsx";
 
 type Props = { data: DocNodeClass & HasFullName; context: ReferenceContext };
 
@@ -52,38 +50,38 @@ export function Class({ data, context }: Props) {
         currentItemName: data.fullName,
       }}
     >
-        <main class={"symbolGroup"}>
-          <article>
+      <main class={"symbolGroup"}>
+        <article>
+          <div>
             <div>
-              <div>
-                <NameHeading fullName={data.fullName} headingType="Class" />
-                <ImplementsSummary typeDef={data.classDef.implements} />
-                <StabilitySummary jsDoc={data.jsDoc} />
-              </div>
+              <NameHeading fullName={data.fullName} headingType="Class" />
+              <ImplementsSummary typeDef={data.classDef.implements} />
+              <StabilitySummary jsDoc={data.jsDoc} />
             </div>
-            <div>
-              <JsDocDescription jsDoc={data.jsDoc} />
-              <Constructors data={data} />
-              <Properties properties={data.classDef.properties} />
-              <Methods methods={instanceMethods} />
-              <Methods methods={staticMethods} label={"Static Methods"} />
-            </div>
-          </article>
-        </main>
-        <TableOfContents>
-          <ul>
-            <TocSection title="Properties">
-              {data.classDef.properties.map((prop) => {
-                return <TocListItem item={prop} type="property" />;
-              })}
-            </TocSection>
-            <TocSection title="Methods">
-              {instanceMethods.map((method) => {
-                return <TocListItem item={method} type="method" />;
-              })}
-            </TocSection>
-          </ul>
-        </TableOfContents>
+          </div>
+          <div>
+            <JsDocDescription jsDoc={data.jsDoc} />
+            <Constructors data={data} />
+            <Properties properties={data.classDef.properties} />
+            <Methods methods={instanceMethods} />
+            <Methods methods={staticMethods} label={"Static Methods"} />
+          </div>
+        </article>
+      </main>
+      <TableOfContents>
+        <ul>
+          <TocSection title="Properties">
+            {data.classDef.properties.map((prop) => {
+              return <TocListItem item={prop} type="property" />;
+            })}
+          </TocSection>
+          <TocSection title="Methods">
+            {instanceMethods.map((method) => {
+              return <TocListItem item={method} type="method" />;
+            })}
+          </TocSection>
+        </ul>
+      </TableOfContents>
     </ReferencePage>
   );
 }
@@ -126,19 +124,6 @@ function Properties({ properties }: { properties: ClassPropertyDef[] }) {
     <MemberSection title="Properties">
       {properties.map((prop) => <PropertyItem property={prop} />)}
     </MemberSection>
-  );
-}
-
-function PropertyItem({ property }: { property: ClassPropertyDef }) {
-  return (
-    <div>
-      <h3>
-        <PropertyName property={property} />
-      </h3>
-      <DetailedSection>
-        <MarkdownContent text={property.jsDoc?.doc} />
-      </DetailedSection>
-    </div>
   );
 }
 
