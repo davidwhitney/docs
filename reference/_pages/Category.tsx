@@ -1,10 +1,19 @@
-import { DocNodeBase, DocNodeClass } from "@deno/doc/types";
+import { DocNodeBase } from "@deno/doc/types";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
-import { flattenItems } from "../_util/common.ts";
-import { LumeDocument, ReferenceContext } from "../types.ts";
+import { flattenItems, sections } from "../_util/common.ts";
+import {
+  LumeDocument,
+  MightHaveNamespace,
+  ReferenceContext,
+} from "../types.ts";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 import { Package } from "./Package.tsx";
 import { SymbolSummaryItem } from "./primatives/SymbolSummaryItem.tsx";
+import {
+  TableOfContents,
+  TocListItem,
+  TocSection,
+} from "./primatives/TableOfContents.tsx";
 
 export default function* getPages(
   context: ReferenceContext,
@@ -33,27 +42,23 @@ type ListingProps = {
 export function CategoryBrowse({ categoryName, context }: ListingProps) {
   const allItems = flattenItems(context.symbols);
 
-  const itemsInThisCategory = allItems.filter((item) =>
+  const validItems = allItems.filter((item) =>
     item.jsDoc?.tags?.some((tag) =>
       tag.kind === "category" &&
       tag.doc.toLocaleLowerCase() === categoryName?.toLocaleLowerCase()
     )
-  );
-
-  const classes = itemsInThisCategory.filter((item) => item.kind === "class")
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  const functions = itemsInThisCategory.filter((item) =>
-    item.kind === "function"
   ).sort((a, b) => a.name.localeCompare(b.name));
 
-  const interfaces = itemsInThisCategory.filter((item) =>
-    item.kind === "interface"
-  ).sort((a, b) => a.name.localeCompare(b.name));
-
-  const typeAliases = itemsInThisCategory.filter((item) =>
-    item.kind === "typeAlias"
-  ).sort((a, b) => a.name.localeCompare(b.name));
+  const itemsOfType = new Map<string, (DocNodeBase & MightHaveNamespace)[]>();
+  for (const item of validItems) {
+    if (!itemsOfType.has(item.kind)) {
+      itemsOfType.set(item.kind, []);
+    }
+    const collection = itemsOfType.get(item.kind);
+    if (!collection?.includes(item)) {
+      collection?.push(item);
+    }
+  }
 
   return (
     <ReferencePage
@@ -65,12 +70,31 @@ export function CategoryBrowse({ categoryName, context }: ListingProps) {
     >
       <main>
         <div className={"space-y-7"}>
-          <CategoryPageSection title={"Classes"} items={classes} />
-          <CategoryPageSection title={"Functions"} items={functions} />
-          <CategoryPageSection title={"Interfaces"} items={interfaces} />
-          <CategoryPageSection title={"Type Aliases"} items={typeAliases} />
+          {sections.map(([title, kind]) => {
+            const matching = itemsOfType.get(kind) || [];
+            return <CategoryPageSection title={title} items={matching} />;
+          })}
         </div>
       </main>
+      <TableOfContents>
+        <ul>
+          {sections.map(([title, kind]) => {
+            const matching = itemsOfType.get(kind) || [];
+            return (
+              <TocSection title={title}>
+                  {matching.map((x) => {
+                    return (
+                      <TocListItem
+                        item={{ name: x.fullName || x.name }}
+                        type={kind}
+                      />
+                    );
+                  })}
+              </TocSection>
+            );
+          })}
+        </ul>
+      </TableOfContents>
     </ReferencePage>
   );
 }

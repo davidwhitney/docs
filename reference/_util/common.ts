@@ -1,6 +1,16 @@
 import { DocNode, DocNodeBase, DocNodeNamespace } from "@deno/doc/types";
 import { HasFullName, HasNamespace, MightHaveNamespace } from "../types.ts";
 
+export const sections = [
+    ["Classes", "class"],
+    ["Enums", "enum"],
+    ["Functions", "function"],
+    ["Interfaces", "interface"],
+    ["Namespaces", "namespace"],
+    ["Type Aliases", "typeAlias"],
+    ["Variables", "variable"],
+];
+
 export function flattenItems(items: DocNode[]): (DocNodeBase & MightHaveNamespace)[] {
     const flattened: (DocNodeBase)[] = [];
     for (const item of items) {
@@ -42,6 +52,5 @@ export function populateItemNamespaces(items: DocNode[], populateNamespace = tru
 
     return flattened;
 }
-
 
 export const nbsp = "\u00A0";

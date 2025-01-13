@@ -12,6 +12,7 @@ import {
 } from "./primatives/TableOfContents.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 import { SymbolSummaryItem } from "./primatives/SymbolSummaryItem.tsx";
+import { sections } from "../_util/common.ts";
 
 type Props = { data: DocNodeNamespace; context: ReferenceContext };
 
@@ -42,39 +43,6 @@ export function Namespace({ data, context }: Props) {
     a.name.localeCompare(b.name)
   );
 
-  const sections = [
-    ["Classes", "class"],
-    ["Enums", "enum"],
-    ["Functions", "function"],
-    ["Interfaces", "interface"],
-    ["Namespaces", "namespace"],
-    ["Type Aliases", "typeAlias"],
-    ["Variables", "variable"],
-  ];
-
-  const sectionElements = sections.map(([title, kind]) => {
-    return (
-      <MemberSection
-        title={title}
-        children={children.filter((x) => x.kind === kind).map((x) => {
-          return <SymbolSummaryItem item={x} />;
-        })}
-      />
-    );
-  });
-
-  const tocSections = sections.map(([title, kind]) => {
-    return (
-      <TocSection title={title}>
-        <ul>
-          {children.filter((x) => x.kind === kind).map((x) => {
-            return <TocListItem item={x} type={kind} />;
-          })}
-        </ul>
-      </TocSection>
-    );
-  });
-
   return (
     <ReferencePage
       context={context}
@@ -94,11 +62,28 @@ export function Namespace({ data, context }: Props) {
             <JsDocDescription jsDoc={data.jsDoc} />
           </div>
         </article>
-        {sectionElements}
+        {sections.map(([title, kind]) => {
+          return (
+            <MemberSection
+              title={title}
+              children={children.filter((x) => x.kind === kind).map((x) => {
+                return <SymbolSummaryItem item={x} />;
+              })}
+            />
+          );
+        })}
       </main>
       <TableOfContents>
         <ul>
-          {tocSections}
+          {sections.map(([title, kind]) => {
+            return (
+              <TocSection title={title}>
+                  {children.filter((x) => x.kind === kind).map((x) => {
+                    return <TocListItem item={x} type={kind} />;
+                  })}
+              </TocSection>
+            );
+          })}
         </ul>
       </TableOfContents>
     </ReferencePage>

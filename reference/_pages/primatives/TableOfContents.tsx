@@ -37,7 +37,7 @@ export function TocSection(
   }
 
   return (
-    <>
+    <ul>
       <li>
         <a href={"#" + title.toLocaleLowerCase()} title={title}>{title}</a>
       </li>
@@ -46,6 +46,6 @@ export function TocSection(
           {children}
         </ul>
       </li>
-    </>
+    </ul>
   );
 }
