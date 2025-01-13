@@ -1,11 +1,15 @@
 import React from "npm:@preact/compat";
-import { ClassDef, DocNodeClass, DocNodeNamespace } from "@deno/doc/types";
+import { DocNodeNamespace } from "@deno/doc/types";
 import { LumeDocument, ReferenceContext } from "../types.ts";
 import generatePageFor from "../pageFactory.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
 import { NameHeading } from "./primatives/NameHeading.tsx";
 import { JsDocDescription } from "./primatives/JsDocDescription.tsx";
-import { TableOfContents, TocSection } from "./primatives/TableOfContents.tsx";
+import {
+  TableOfContents,
+  TocListItem,
+  TocSection,
+} from "./primatives/TableOfContents.tsx";
 import { AnchorableHeading } from "./primatives/AnchorableHeading.tsx";
 import { SymbolSummaryItem } from "./primatives/SymbolSummaryItem.tsx";
 
@@ -38,6 +42,39 @@ export function Namespace({ data, context }: Props) {
     a.name.localeCompare(b.name)
   );
 
+  const sections = [
+    ["Classes", "class"],
+    ["Enums", "enum"],
+    ["Functions", "function"],
+    ["Interfaces", "interface"],
+    ["Namespaces", "namespace"],
+    ["Type Aliases", "typeAlias"],
+    ["Variables", "variable"],
+  ];
+
+  const sectionElements = sections.map(([title, kind]) => {
+    return (
+      <MemberSection
+        title={title}
+        children={children.filter((x) => x.kind === kind).map((x) => {
+          return <SymbolSummaryItem item={x} />;
+        })}
+      />
+    );
+  });
+
+  const tocSections = sections.map(([title, kind]) => {
+    return (
+      <TocSection title={title}>
+        <ul>
+          {children.filter((x) => x.kind === kind).map((x) => {
+            return <TocListItem item={x} type={kind} />;
+          })}
+        </ul>
+      </TocSection>
+    );
+  });
+
   return (
     <ReferencePage
       context={context}
@@ -57,58 +94,24 @@ export function Namespace({ data, context }: Props) {
             <JsDocDescription jsDoc={data.jsDoc} />
           </div>
         </article>
-        <Classes
-          classes={children.filter((x) => x.kind === "class")}
-        />
+        {sectionElements}
       </main>
       <TableOfContents>
         <ul>
-          <TocSection title="Classes">
-            <></>
-          </TocSection>
-          <TocSection title="Enums">
-            <></>
-          </TocSection>
-          <TocSection title="Functions">
-            <></>
-          </TocSection>
-          <TocSection title="Interfaces">
-            <></>
-          </TocSection>
-          <TocSection title="Namespaces">
-            <></>
-          </TocSection>
-          <TocSection title="Type Aliases">
-            <></>
-          </TocSection>
-          <TocSection title="Variables">
-            <></>
-          </TocSection>
+          {tocSections}
         </ul>
       </TableOfContents>
     </ReferencePage>
   );
 }
 
-function Classes(
-  { classes }: { classes: DocNodeClass[] },
-) {
-  if (classes.length === 0) {
-    return <></>;
-  }
-
-  return (
-    <MemberSection title={"Classes"}>
-      {classes.map((klass) => {
-        return <SymbolSummaryItem item={klass} />;
-      })}
-    </MemberSection>
-  );
-}
-
 function MemberSection(
   { title, children }: { title: string; children: React.ReactNode },
 ) {
+  if (!children) {
+    return null;
+  }
+
   return (
     <div>
       <div className={"space-y-7"}>

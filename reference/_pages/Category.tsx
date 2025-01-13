@@ -78,6 +78,10 @@ export function CategoryBrowse({ categoryName, context }: ListingProps) {
 function CategoryPageSection(
   { title, items }: { title: string; items: DocNodeBase[] },
 ) {
+  if (items.length === 0) {
+    return null;
+  }
+
   const anchorId = title.replace(" ", "-").toLocaleLowerCase();
   return (
     <section id={anchorId} className={"section"}>

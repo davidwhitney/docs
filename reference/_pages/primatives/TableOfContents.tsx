@@ -14,7 +14,7 @@ export function TableOfContents({ children }: { children: React.ReactNode }) {
 }
 
 export function TocListItem(
-  { item, type }: { item: { name: string }; type: "property" | "method" },
+  { item, type }: { item: { name: string }; type: string },
 ) {
   return (
     <li>
