@@ -1,11 +1,6 @@
 import { DocNodeClass } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
-import {
-  TableOfContents,
-  TocListItem,
-  TocSection,
-} from "./partials/TableOfContents.tsx";
 import { NameHeading } from "./partials/NameHeading.tsx";
 import { StabilitySummary } from "./partials/Badges.tsx";
 import { ImplementsSummary } from "./partials/ImplementsSummary.tsx";
@@ -26,10 +21,6 @@ export default function* getPages(
 }
 
 export function Class({ data, context }: Props) {
-  const instanceMethods = data.classDef.methods.filter((method) =>
-    !method.isStatic
-  );
-
   const { details, contents } = getSymbolDetails(data);
 
   return (

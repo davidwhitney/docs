@@ -38,7 +38,7 @@ export function Function({ data, context }: Props) {
               <NameHeading fullName={data.fullName} headingType="Function" />
               <StabilitySummary jsDoc={data.jsDoc} />
             </div>
-          </div>{" "}
+          </div>
           <div>
             <FunctionSignature
               functionDef={data.functionDef}

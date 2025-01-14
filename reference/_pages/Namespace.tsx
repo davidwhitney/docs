@@ -19,13 +19,10 @@ export default function* getPages(
   item: DocNodeNamespace,
   context: ReferenceContext,
 ): IterableIterator<LumeDocument> {
-  const url =
-    `${context.root}/${context.packageName.toLocaleLowerCase()}/~/${item.name}`;
-  console.log("Namespace url", url);
-
   yield {
     title: item.name,
-    url: url,
+    url:
+      `${context.root}/${context.packageName.toLocaleLowerCase()}/~/${item.name}`,
     content: <Namespace data={item} context={context} />,
   };
 
