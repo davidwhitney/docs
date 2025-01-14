@@ -1,6 +1,6 @@
 import generatePageFor from "./pageFactory.ts";
 import getCategoryPages from "./_pages/Category.tsx";
-import { populateItemNamespaces } from "./_util/common.ts";
+import { countSymbols, populateItemNamespaces } from "./_util/common.ts";
 import { getSymbols } from "./_dataSources/dtsSymbolSource.ts";
 import webCategoryDocs from "./_categories/web-categories.json" with {
   type: "json",
@@ -31,10 +31,10 @@ export const sidebar = [
   },
 ];
 
-const generated: string[] = [];
-let skipped = 0;
-
 export default async function* () {
+  let skipped = 0;
+  const generated: string[] = [];
+
   try {
     if (Deno.env.has("SKIP_REFERENCE")) {
       throw new Error();
@@ -77,25 +77,23 @@ export default async function* () {
     console.warn("⚠️ Reference docs were not generated." + ex);
   }
 
-  console.log(
-    "Generated",
-    generated.length,
-    "reference pages",
-    skipped,
-    "skipped",
-  );
+  console.log("Generated", generated.length, "pages", skipped, "skipped");
 }
 
 async function getAllSymbols() {
   const allSymbols = new Map<string, DocNode[]>();
   for await (const { packageName, symbols } of getSymbols()) {
-    const cleanedSymbols = populateItemNamespaces(
+    console.log(`📚 ${packageName} has ${countSymbols(symbols)} symbols`);
+
+    const cleaned = populateItemNamespaces(
       symbols,
     ) as (DocNode & HasNamespace)[];
 
+    console.log(`📚 ${packageName} has ${countSymbols(cleaned)} cleaned`);
+
     const symbolsByName = new Map<string, (DocNode & HasNamespace)[]>();
 
-    for (const symbol of cleanedSymbols) {
+    for (const symbol of cleaned) {
       const existing = symbolsByName.get(symbol.fullName) || [];
       symbolsByName.set(symbol.name, [...existing, symbol]);
     }

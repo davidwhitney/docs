@@ -54,3 +54,14 @@ export function populateItemNamespaces(items: DocNode[], populateNamespace = tru
 }
 
 export const nbsp = "\u00A0";
+
+export function countSymbols(symbols: DocNode[]): number {
+    let count = 0;
+    for (const symbol of symbols) {
+        count++;
+        if (symbol.kind === "namespace" && symbol.namespaceDef) {
+            count += countSymbols(symbol.namespaceDef.elements);
+        }
+    }
+    return count;
+}
