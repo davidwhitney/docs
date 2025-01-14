@@ -1,4 +1,5 @@
-import { ClassPropertyDef, InterfacePropertyDef, JsDoc } from "@deno/doc/types";
+import { JsDoc } from "@deno/doc/types";
+import { ValidPropertyType } from "../../types.ts";
 
 export function StabilitySummary({ jsDoc }: { jsDoc: JsDoc | undefined }) {
   const isUnstable = jsDoc?.tags?.some((tag) =>
@@ -19,7 +20,9 @@ export function StabilitySummary({ jsDoc }: { jsDoc: JsDoc | undefined }) {
 }
 
 export function PropertyBadges(
-  { property }: { property: ClassPropertyDef | InterfacePropertyDef },
+  { property }: {
+    property: ValidPropertyType;
+  },
 ) {
   return (
     <>
@@ -30,7 +33,9 @@ export function PropertyBadges(
 }
 
 export function OptionalSummary(
-  { property }: { property: ClassPropertyDef | InterfacePropertyDef },
+  { property }: {
+    property: ValidPropertyType;
+  },
 ) {
   if (!property.optional) {
     return null;
@@ -46,7 +51,9 @@ export function OptionalSummary(
 }
 
 export function ReadOnlySummary(
-  { property }: { property: ClassPropertyDef | InterfacePropertyDef },
+  { property }: {
+    property: ValidPropertyType;
+  },
 ) {
   if (!property.readonly) {
     return null;

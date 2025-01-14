@@ -1,27 +1,11 @@
-import {
-  DocNodeInterface,
-  InterfaceDef,
-  InterfaceMethodDef,
-  InterfacePropertyDef,
-  TsTypeDef,
-} from "@deno/doc/types";
+import { DocNodeInterface, TsTypeDef } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
-import { MarkdownContent } from "./primitives/MarkdownContent.tsx";
-import {
-  TableOfContents,
-  TocListItem,
-  TocSection,
-} from "./partials/TableOfContents.tsx";
 import { NameHeading } from "./partials/NameHeading.tsx";
 import { StabilitySummary } from "./partials/Badges.tsx";
-import { JsDocDescription } from "./partials/JsDocDescription.tsx";
-import { DetailedSection } from "./partials/DetailedSection.tsx";
-import { InterfaceMethodSignature } from "./primitives/InterfaceMethodSignature.tsx";
 import { TypeSummary } from "./primitives/TypeSummary.tsx";
 import { nbsp } from "../_util/common.ts";
-import { MemberSection } from "./partials/MemberSection.tsx";
-import { PropertyItem } from "./partials/PropertyItem.tsx";
+import { getSymbolDetails } from "./partials/SymbolDetails.tsx";
 
 type Props = {
   data: DocNodeInterface & HasFullName;
@@ -41,6 +25,8 @@ export default function* getPages(
 }
 
 export function Interface({ data, context }: Props) {
+  const { details, contents } = getSymbolDetails(data);
+
   return (
     <ReferencePage
       context={context}
@@ -59,66 +45,12 @@ export function Interface({ data, context }: Props) {
             </div>
           </div>
           <div>
-            <JsDocDescription jsDoc={data.jsDoc} />
-            <Properties properties={data.interfaceDef.properties} />
-            <Methods iface={data.interfaceDef} />
+            {details}
           </div>
         </article>
       </main>
-      <TableOfContents>
-        <ul>
-          <TocSection title="Properties">
-            {data.interfaceDef.properties.map((prop) => {
-              return <TocListItem item={prop} type="property" />;
-            })}
-          </TocSection>
-          <TocSection title="Methods">
-            {data.interfaceDef.methods.map((method) => {
-              return <TocListItem item={method} type="method" />;
-            })}
-          </TocSection>
-        </ul>
-      </TableOfContents>
+      {contents}
     </ReferencePage>
-  );
-}
-
-function Methods({ iface }: { iface: InterfaceDef }) {
-  if (iface.methods.length === 0) {
-    return <></>;
-  }
-
-  return (
-    <MemberSection title={"Methods"}>
-      {iface.methods.map((item) => {
-        return <MethodSummary method={item} />;
-      })}
-    </MemberSection>
-  );
-}
-
-function MethodSummary({ method }: { method: InterfaceMethodDef }) {
-  return (
-    <div>
-      <div>
-        <InterfaceMethodSignature method={method} />
-      </div>
-      <DetailedSection>
-        <MarkdownContent text={method.jsDoc?.doc || ""} />
-      </DetailedSection>
-    </div>
-  );
-}
-
-function Properties({ properties }: { properties: InterfacePropertyDef[] }) {
-  if (properties.length === 0) {
-    return <></>;
-  }
-
-  return (
-    <MemberSection title="Properties">
-      {properties.map((prop) => <PropertyItem property={prop} />)}
-    </MemberSection>
   );
 }
 

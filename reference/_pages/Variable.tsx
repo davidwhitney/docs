@@ -7,6 +7,7 @@ import { JsDocDescription } from "./partials/JsDocDescription.tsx";
 import { DetailedSection } from "./partials/DetailedSection.tsx";
 import { MemberSection } from "./partials/MemberSection.tsx";
 import { TypeSummary } from "./primitives/TypeSummary.tsx";
+import { getSymbolDetails } from "./partials/SymbolDetails.tsx";
 
 type Props = { data: DocNodeVariable & HasFullName; context: ReferenceContext };
 
@@ -23,6 +24,8 @@ export default function* getPages(
 }
 
 export function Variable({ data, context }: Props) {
+  const { details, contents } = getSymbolDetails(data);
+
   return (
     <ReferencePage
       context={context}
@@ -44,12 +47,11 @@ export function Variable({ data, context }: Props) {
             <VariableType type={data.variableDef} />
           </div>
           <div>
-            <div class="code">
-              {JSON.stringify(data, null, 2)}
-            </div>
+            {details}
           </div>
         </article>
       </main>
+      {contents}
     </ReferencePage>
   );
 }
