@@ -22,13 +22,23 @@ export function insertLinkCodes(text: string) {
       return part;
     }
 
-    const symbol = match[1].trim();
-    const target = "~/" + symbol;
+    const symbolParts = match[1].trim();
+    const [url, title] = symbolParts.includes("|")
+      ? symbolParts.split("|").map((s) => s.trim())
+      : [symbolParts, symbolParts];
 
-    return `<a href="${target}"><code>${symbol}</code></a>`;
+    // Edge case where markdown inserts full URL
+    if (url.startsWith("<a href")) {
+      return url.replace(/<a href="([^"]+)">([^<]+)<\/a>/, (_, url, __) => {
+        return `<a href="${url}"><code>${title}</code></a>`;
+      });
+    }
+
+    const href = url.startsWith("http") ? url : "~/" + url;
+    return `<a href="${href}"><code>${title}</code></a>`;
   });
 
-  return partsAfterSub.join("");
+  return partsAfterSub.join("").trim();
 }
 
 export function linkCodeAndParagraph(text: string) {

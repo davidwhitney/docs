@@ -206,5 +206,11 @@ export function typeInformation(type: TsTypeDef | undefined): CodePart[] {
         parts.push(...typeInformation(type.fnOrConstructor.tsType));
     }
 
+    if (type.kind === "typeOperator") {
+        parts.push({ value: type.typeOperator.operator, kind: "type" });
+        parts.push({ value: " ", kind: "type" });
+        parts.push(...typeInformation(type.typeOperator.tsType));
+    }
+
     return parts;
 }

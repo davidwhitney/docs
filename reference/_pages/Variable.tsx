@@ -1,12 +1,12 @@
-import { DocNodeVariable } from "@deno/doc/types";
+import { DocNodeVariable, VariableDef } from "@deno/doc/types";
 import { HasFullName, LumeDocument, ReferenceContext } from "../types.ts";
 import ReferencePage from "../_layouts/ReferencePage.tsx";
-import { MarkdownContent } from "./primitives/MarkdownContent.tsx";
-import { TableOfContents, TocListItem, TocSection } from "./partials/TableOfContents.tsx";
 import { NameHeading } from "./partials/NameHeading.tsx";
 import { StabilitySummary } from "./partials/Badges.tsx";
 import { JsDocDescription } from "./partials/JsDocDescription.tsx";
 import { DetailedSection } from "./partials/DetailedSection.tsx";
+import { MemberSection } from "./partials/MemberSection.tsx";
+import { TypeSummary } from "./primitives/TypeSummary.tsx";
 
 type Props = { data: DocNodeVariable & HasFullName; context: ReferenceContext };
 
@@ -26,7 +26,10 @@ export function Variable({ data, context }: Props) {
   return (
     <ReferencePage
       context={context}
-      navigation={{ category: context.packageName, currentItemName: data.name }}
+      navigation={{
+        category: context.packageName,
+        currentItemName: data.fullName,
+      }}
     >
       <main class={"symbolGroup"}>
         <article>
@@ -38,25 +41,25 @@ export function Variable({ data, context }: Props) {
           </div>
           <div>
             <JsDocDescription jsDoc={data.jsDoc} />
-            <VariableType type={data.variableDef.tsType} />
+            <VariableType type={data.variableDef} />
+          </div>
+          <div>
+            <div class="code">
+              {JSON.stringify(data, null, 2)}
+            </div>
           </div>
         </article>
       </main>
-      <TableOfContents>
-        <ul>
-          <TocSection title="Variable">
-            <TocListItem item={data} type="variable" />
-          </TocSection>
-        </ul>
-      </TableOfContents>
     </ReferencePage>
   );
 }
 
-function VariableType({ type }: { type: any }) {
+function VariableType({ type }: { type: VariableDef }) {
   return (
-    <DetailedSection>
-      <MarkdownContent text={`Type: ${type.repr}`} />
-    </DetailedSection>
+    <MemberSection title={"Type"}>
+      <DetailedSection>
+        <TypeSummary typeDef={type.tsType!} />
+      </DetailedSection>
+    </MemberSection>
   );
 }

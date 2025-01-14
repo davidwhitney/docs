@@ -2,7 +2,7 @@ import { TsTypeDef } from "@deno/doc/types";
 import { typeInformation } from "../../_util/symbolStringBuilding.ts";
 
 type Props = {
-  typeDef: TsTypeDef;
+  typeDef: TsTypeDef | undefined;
   extraClasses?: string[];
 };
 
