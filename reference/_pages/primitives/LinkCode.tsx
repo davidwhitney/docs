@@ -23,15 +23,17 @@ export function insertLinkCodes(text: string) {
     }
 
     const symbolParts = match[1].trim();
+
     const [url, title] = symbolParts.includes("|")
       ? symbolParts.split("|").map((s) => s.trim())
       : [symbolParts, symbolParts];
 
     // Edge case where markdown inserts full URL
     if (url.startsWith("<a href")) {
-      return url.replace(/<a href="([^"]+)">([^<]+)<\/a>/, (_, url, __) => {
-        return `<a href="${url}"><code>${title}</code></a>`;
-      });
+      return url.replace(
+        /<a href="([^"]+)">([^<]+)<\/a>/,
+        (_, url, __) => (`<a href="${url}"><code>${title}</code></a>`),
+      );
     }
 
     const href = url.startsWith("http") ? url : "~/" + url;
